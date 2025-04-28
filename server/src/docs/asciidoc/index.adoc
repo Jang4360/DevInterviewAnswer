@@ -1,0 +1,122 @@
+= API 문서
+:toc: left
+:toclevels: 2
+:sectlinks:
+:sectanchors:
+
+== 회원 API
+
+=== 회원가입 API
+
+==== 요청
+include::{snippets}/signup-success/http-request.adoc[]
+include::{snippets}/signup-success/request-fields.adoc[]
+
+==== 응답
+include::{snippets}/signup-success/http-response.adoc[]
+include::{snippets}/signup-success/response-fields.adoc[]
+
+== 인증 API
+
+=== 로그인 API
+
+==== 요청
+include::{snippets}/login-success/http-request.adoc[]
+include::{snippets}/login-success/request-fields.adoc[]
+
+==== 응답
+include::{snippets}/login-success/http-response.adoc[]
+include::{snippets}/login-success/response-fields.adoc[]
+
+=== 토큰 재발급 API
+
+==== 요청
+include::{snippets}/reissue-success/http-request.adoc[]
+include::{snippets}/reissue-success/query-parameters.adoc[]
+
+==== 응답
+include::{snippets}/reissue-success/http-response.adoc[]
+include::{snippets}/reissue-success/response-fields.adoc[]
+
+== 글쓰기 API
+
+=== 글 생성 API
+
+==== 요청
+include::{snippets}/writing-create-success/http-request.adoc[]
+include::{snippets}/writing-create-success/request-fields.adoc[]
+
+==== 응답
+include::{snippets}/writing-create-success/http-response.adoc[]
+include::{snippets}/writing-create-success/response-fields.adoc[]
+
+== 복습 API
+
+=== 복습 완료 API
+
+==== 요청
+include::{snippets}/review-success/http-request.adoc[]
+include::{snippets}/review-success/request-fields.adoc[]
+
+==== 응답
+include::{snippets}/review-success/http-response.adoc[]
+=== 질문 복습 횟수 조회 API
+
+==== 요청
+include::{snippets}/review-qna-count-success/http-request.adoc[]
+include::{snippets}/review-qna-count-success/path-parameters.adoc[]
+
+==== 응답
+include::{snippets}/review-qna-count-success/http-response.adoc[]
+include::{snippets}/review-qna-count-success/response-fields.adoc[]
+
+=== 사용자 복습 횟수 조회 API
+
+==== 요청
+include::{snippets}/review-user-count-success/http-request.adoc[]
+include::{snippets}/review-user-count-success/path-parameters.adoc[]
+
+==== 응답
+include::{snippets}/review-user-count-success/http-response.adoc[]
+include::{snippets}/review-user-count-success/response-fields.adoc[]
+
+== 질문(QnA) API
+
+=== 질문 생성 API
+
+==== 요청
+include::{snippets}/qna-create-success/http-request.adoc[]
+include::{snippets}/qna-create-success/request-fields.adoc[]
+
+==== 응답
+include::{snippets}/qna-create-success/http-response.adoc[]
+include::{snippets}/qna-create-success/response-fields.adoc[]
+
+=== 오늘 복습할 질문 조회 API
+
+==== 요청
+include::{snippets}/qna-today-review-success/http-request.adoc[]
+include::{snippets}/qna-today-review-success/query-parameters.adoc[]
+
+==== 응답
+include::{snippets}/qna-today-review-success/http-response.adoc[]
+include::{snippets}/qna-today-review-success/response-fields.adoc[]
+
+=== 사용자별 전체 질문 조회 API
+
+==== 요청
+include::{snippets}/qna-user-list-success/http-request.adoc[]
+include::{snippets}/qna-user-list-success/path-parameters.adoc[]
+
+==== 응답
+include::{snippets}/qna-user-list-success/http-response.adoc[]
+include::{snippets}/qna-user-list-success/response-fields.adoc[]
+
+=== 질문 삭제 API
+
+==== 요청
+include::{snippets}/qna-delete-success/http-request.adoc[]
+include::{snippets}/qna-delete-success/path-parameters.adoc[]
+
+==== 응답
+include::{snippets}/qna-delete-success/http-response.adoc[]

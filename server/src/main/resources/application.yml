@@ -1,0 +1,33 @@
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  security:
+    user:
+      name: user
+      password: 1234
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          lob:
+            non_contextual_creation: true
+    show-sql: true
+
+jwt:
+  secret: ${JWT_SECRET}
+
+openai:
+  api:
+    key: ${OPENAI_API_KEY}
+
+qdrant:
+  api:
+    url: ${QDRANT_API_URL}
