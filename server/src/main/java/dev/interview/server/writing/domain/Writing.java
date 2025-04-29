@@ -1,5 +1,6 @@
 package dev.interview.server.writing.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import dev.interview.server.user.domain.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -13,6 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Writing {
     @Id
     @GeneratedValue

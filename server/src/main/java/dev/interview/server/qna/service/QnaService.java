@@ -53,7 +53,7 @@ public class QnaService {
     // 사용자별 복습 대상 질문 조회
     @Transactional(readOnly = true)
     public List<QnaTodayResponse> getReviewQnasForToday(UUID userId) {
-        List<Qna> qnaList = qnaRepository.findAllByUserIdAndScheduledDateBeforeAndIsDeletedFalse(userId, LocalDateTime.now());
+        List<Qna> qnaList = qnaRepository.findByUserIdAndScheduleDateAndReviewedFalse(userId, LocalDateTime.now());
         return qnaList.stream()
                 .map(QnaTodayResponse::from)
                 .toList();
@@ -68,5 +68,11 @@ public class QnaService {
             throw new ForbiddenException("자신의 질문만 삭제할 수 있습니다.");
         }
         qna.markAsDeleted(); // soft delete
+    }
+
+    //
+    public Qna findById(String id) {
+        return qnaRepository.findById(UUID.fromString(id))
+                .orElseThrow(() -> new NotFoundException("QnA를 찾을 수 없습니다"));
     }
 }

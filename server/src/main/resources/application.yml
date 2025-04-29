@@ -15,6 +15,7 @@ spring:
       ddl-auto: update
     properties:
       hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect   # ✨ 이거 추가!!
         format_sql: true
         jdbc:
           lob:

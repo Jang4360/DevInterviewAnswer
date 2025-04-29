@@ -1,5 +1,6 @@
 package dev.interview.server.qna.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import dev.interview.server.user.domain.User;
 import dev.interview.server.writing.domain.Writing;
 import jakarta.persistence.*;
@@ -12,9 +13,11 @@ import java.util.UUID;
 @Entity
 @Table(name = "qna")
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Qna {
     @Id
     @GeneratedValue
@@ -35,6 +38,9 @@ public class Qna {
 
     @Column(name = "is_deleted")
     private boolean isDeleted;
+
+    @Column(nullable = false)
+    private boolean reviewed = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "writing_id")

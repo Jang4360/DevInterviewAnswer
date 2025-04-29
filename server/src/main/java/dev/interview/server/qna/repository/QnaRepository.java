@@ -14,5 +14,5 @@ public interface QnaRepository extends JpaRepository<Qna,UUID> {
     List<Qna> findAllByUserId(UUID userId);
 
     // 특정 날짜 기준 복습 대상 질문 조회
-    List<Qna> findAllByUserIdAndScheduledDateBeforeAndIsDeletedFalse(UUID userId, LocalDateTime today);
+    List<Qna> findByUserIdAndScheduleDateAndReviewedFalse(UUID userId, LocalDateTime today);
 }

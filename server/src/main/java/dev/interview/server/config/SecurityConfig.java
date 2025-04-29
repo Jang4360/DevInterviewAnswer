@@ -29,7 +29,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                //로그인 인즈
+                //로그인 인증
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults()) // cors 가 security 에도 반영됨 (안하면 Security 가 Cors 요청 자체를 막음)
                 .csrf(CsrfConfigurer::disable)

@@ -1,5 +1,6 @@
 package dev.interview.server.review.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import dev.interview.server.qna.domain.Qna;
 import dev.interview.server.user.domain.User;
 import jakarta.persistence.*;
@@ -15,6 +16,7 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class ReviewQueue {
     @Id
     @GeneratedValue

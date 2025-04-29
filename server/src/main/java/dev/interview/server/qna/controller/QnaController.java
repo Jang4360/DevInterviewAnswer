@@ -66,4 +66,15 @@ public class QnaController {
         qnaService.deleteQna(qnaId,userId);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Qna> getQnaById(@PathVariable String id) {
+        // QnA 데이터를 조회하는 로직
+        Qna qna = qnaService.findById(id);
+        if (qna != null) {
+            return ResponseEntity.ok(qna);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

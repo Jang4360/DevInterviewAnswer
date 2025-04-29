@@ -1,83 +1,80 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 import Button from "@/components/common/Button";
 import api from "@/utils/api";
 
-export default function GeneratedQnAPage() {
-  const [qnaList, setQnaList] = useState([]);
-  const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
+export default function QuestionDetailPage() {
   const router = useRouter();
+  const { questionId, fromSidebar } = router.query;
+  const [questionDetail, setQuestionDetail] = useState(null);
+  const [showAnswer, setShowAnswer] = useState(false);
 
   useEffect(() => {
-    const savedQnA = localStorage.getItem("generatedQnA");
-    if (savedQnA) {
-      setQnaList(JSON.parse(savedQnA));
+    if (router.isReady && questionId) {
+      fetchQuestionDetail();
     }
-  }, []);
+  }, [router.isReady, questionId]);
 
-  const toggleSelect = (index: number) => {
-    if (selectedIndexes.includes(index)) {
-      setSelectedIndexes(selectedIndexes.filter((i) => i !== index));
-    } else {
-      setSelectedIndexes([...selectedIndexes, index]);
+  const fetchQuestionDetail = async () => {
+    try {
+      const res = await api.get(`/qna/${questionId}`);
+      setQuestionDetail(res.data);
+    } catch (error) {
+      console.error(error);
     }
   };
 
-  const handleSave = async () => {
+  const handleCompleteReview = async () => {
     const userId = localStorage.getItem("userId");
-    const writingId = localStorage.getItem("writingId");
-
-    const selectedQnAs = selectedIndexes.map((index) => qnaList[index]);
-
     try {
-      for (const qna of selectedQnAs) {
-        await api.post(`/qna/${writingId}`, {
-          userId,
-          question: qna.question,
-          answer: qna.answer,
-        });
-      }
-
-      alert("질문 저장 완료!");
-      localStorage.removeItem("generatedQnA");
+      await api.post(`/review`, {
+        userId: userId,
+        qnaId: questionDetail.id,
+      });
+      alert("복습 완료 처리되었습니다!");
       router.push("/review");
     } catch (error) {
       console.error(error);
-      alert("저장 실패");
+      alert("복습 완료 실패");
     }
   };
 
+  if (!questionDetail) {
+    return <div className="p-6 text-white">로딩 중...</div>;
+  }
+
   return (
     <div className="p-6 text-white">
-      <h2 className="text-xl font-bold mb-4">생성된 질문 목록</h2>
+      <h2 className="text-xl font-bold mb-6">{questionDetail.question}</h2>
 
-      {qnaList.map((qna: any, index: number) => (
-        <div key={index} className="bg-[#303030] p-4 rounded mb-4">
-          <label className="flex items-start space-x-2">
-            <input
-              type="checkbox"
-              checked={selectedIndexes.includes(index)}
-              onChange={() => toggleSelect(index)}
-            />
-            <div>
-              <p>
-                <strong>Q:</strong> {qna.question}
-              </p>
-              <p>
-                <strong>A:</strong> {qna.answer}
-              </p>
-            </div>
-          </label>
+      <textarea
+        className="w-full p-4 rounded bg-[#303030] text-white mb-6"
+        rows={6}
+        placeholder="답변을 작성해보세요..."
+      />
+
+      {!showAnswer ? (
+        <div className="flex justify-center">
+          <Button onClick={() => setShowAnswer(true)} className="px-6 py-3">
+            답변 확인하기
+          </Button>
         </div>
-      ))}
+      ) : (
+        <div className="mt-4 p-4 bg-[#404040] rounded">
+          <strong>모범 답변:</strong>
+          <p className="mt-2">{questionDetail.answer}</p>
+        </div>
+      )}
 
-      <div className="flex justify-center mt-6">
-        <Button onClick={handleSave} className="px-6 py-3">
-          저장하기
-        </Button>
-      </div>
+      {fromSidebar && (
+        <div className="flex justify-center mt-6">
+          <Button onClick={handleCompleteReview} className="px-6 py-3">
+            복습 완료
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

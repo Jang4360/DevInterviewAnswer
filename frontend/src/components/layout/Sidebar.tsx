@@ -38,7 +38,12 @@ export default function Sidebar() {
                   key={review.id}
                   className="text-sm hover:underline cursor-pointer"
                 >
-                  <Link href={`/review/${review.id}?fromSidebar=true`}>
+                  <Link
+                    href={{
+                      pathname: `/review/${review.id}`,
+                      query: { fromSidebar: true },
+                    }}
+                  >
                     {review.question}
                   </Link>
                 </li>
