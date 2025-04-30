@@ -47,13 +47,13 @@ public class QnaService {
 
     // 사용자별 질문 전체 조회
     public List<Qna> getAllByUserId(UUID userId) {
-        return qnaRepository.findAllByUserId(userId);
+        return qnaRepository.findAllByUserIdAndIsDeletedFalse(userId);
     }
 
     // 사용자별 복습 대상 질문 조회
     @Transactional(readOnly = true)
     public List<QnaTodayResponse> getReviewQnasForToday(UUID userId) {
-        List<Qna> qnaList = qnaRepository.findByUserIdAndScheduleDateAndReviewedFalse(userId, LocalDateTime.now());
+        List<Qna> qnaList = qnaRepository.findByUserIdAndScheduledDateAndReviewedFalseAndIsDeletedFalse(userId, LocalDateTime.now());
         return qnaList.stream()
                 .map(QnaTodayResponse::from)
                 .toList();

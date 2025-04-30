@@ -1,3 +1,4 @@
+// pages/review/[questionId].tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -12,9 +13,8 @@ export default function QuestionDetailPage() {
   const [showAnswer, setShowAnswer] = useState(false);
 
   useEffect(() => {
-    if (router.isReady && questionId) {
-      fetchQuestionDetail();
-    }
+    if (!router.isReady || !questionId) return;
+    fetchQuestionDetail();
   }, [router.isReady, questionId]);
 
   const fetchQuestionDetail = async () => {
@@ -22,7 +22,7 @@ export default function QuestionDetailPage() {
       const res = await api.get(`/qna/${questionId}`);
       setQuestionDetail(res.data);
     } catch (error) {
-      console.error(error);
+      console.error("질문 조회 실패", error);
     }
   };
 

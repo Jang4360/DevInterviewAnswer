@@ -11,8 +11,8 @@ import java.util.UUID;
 public interface QnaRepository extends JpaRepository<Qna,UUID> {
 
     // 사용자별 질문 목록 조회 (복습 리스트 표시)
-    List<Qna> findAllByUserId(UUID userId);
+    List<Qna> findAllByUserIdAndIsDeletedFalse(UUID userId);
 
     // 특정 날짜 기준 복습 대상 질문 조회
-    List<Qna> findByUserIdAndScheduleDateAndReviewedFalse(UUID userId, LocalDateTime today);
+    List<Qna> findByUserIdAndScheduledDateAndReviewedFalseAndIsDeletedFalse(UUID userId, LocalDateTime today);
 }

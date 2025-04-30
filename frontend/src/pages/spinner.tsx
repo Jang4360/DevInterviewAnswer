@@ -30,7 +30,7 @@ export default function SpinnerPage() {
         localStorage.setItem("generatedQnA", JSON.stringify(qnaList));
 
         // 질문 상세 페이지로 이동
-        router.push("/review/generated?fromCreate=true");
+        router.push("/review/generated");
       } catch (error) {
         console.error(error);
         alert("질문 생성 실패");

@@ -106,12 +106,12 @@ public class QnaServiceTest {
         UUID userId = UUID.randomUUID();
         Qna qna = Qna.builder().id(UUID.randomUUID()).build();
 
-        when(qnaRepository.findAllByUserId(userId)).thenReturn(List.of(qna));
+        when(qnaRepository.findAllByUserIdAndIsDeletedFalse(userId)).thenReturn(List.of(qna));
 
         List<Qna> result = qnaService.getAllByUserId(userId);
 
         assertEquals(1, result.size());
-        verify(qnaRepository).findAllByUserId(userId);
+        verify(qnaRepository).findAllByUserIdAndIsDeletedFalse(userId);
     }
 
     // 오늘 리뷰 qna 조회
@@ -124,13 +124,13 @@ public class QnaServiceTest {
                 .isDeleted(false)
                 .build();
 
-        when(qnaRepository.findAllByUserIdAndScheduledDateBeforeAndIsDeletedFalse(eq(userId), any(LocalDateTime.class)))
+        when(qnaRepository.findByUserIdAndScheduledDateAndReviewedFalseAndIsDeletedFalse(eq(userId), any(LocalDateTime.class)))
                 .thenReturn(List.of(qna));
 
         List<QnaTodayResponse> result = qnaService.getReviewQnasForToday(userId);
 
         assertEquals(1, result.size());
-        verify(qnaRepository).findAllByUserIdAndScheduledDateBeforeAndIsDeletedFalse(eq(userId), any(LocalDateTime.class));
+        verify(qnaRepository).findByUserIdAndScheduledDateAndReviewedFalseAndIsDeletedFalse(eq(userId), any(LocalDateTime.class));
     }
 
     // 삭제 성공 테스트
