@@ -49,7 +49,7 @@ public class ReviewService {
         else if (count == 3) nextSchedule = LocalDateTime.now().plusDays(15);
         else if (count == 4) nextSchedule = LocalDateTime.now().plusDays(30);
 
-        // 5. Qna 에 다음 복습 일자 갱신
+        // 5. Qna 에 복습완료, 다음 복습 일자 갱신
         qna.setReviewed(true);
         qna.updateScheduledDate(nextSchedule);
     }

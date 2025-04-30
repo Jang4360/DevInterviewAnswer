@@ -1,16 +1,17 @@
-// pages/review/[questionId].tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Button from "@/components/common/Button";
 import api from "@/utils/api";
+import useTodayReviews from "@/stores/useTodayReviews";
 
 export default function QuestionDetailPage() {
   const router = useRouter();
   const { questionId, fromSidebar } = router.query;
   const [questionDetail, setQuestionDetail] = useState(null);
   const [showAnswer, setShowAnswer] = useState(false);
+  const { removeReviewById } = useTodayReviews();
 
   useEffect(() => {
     if (!router.isReady || !questionId) return;
@@ -34,6 +35,7 @@ export default function QuestionDetailPage() {
         qnaId: questionDetail.id,
       });
       alert("복습 완료 처리되었습니다!");
+      removeReviewById(questionDetail.id);
       router.push("/review");
     } catch (error) {
       console.error(error);
@@ -55,13 +57,16 @@ export default function QuestionDetailPage() {
         placeholder="답변을 작성해보세요..."
       />
 
-      {!showAnswer ? (
-        <div className="flex justify-center">
-          <Button onClick={() => setShowAnswer(true)} className="px-6 py-3">
-            답변 확인하기
-          </Button>
-        </div>
-      ) : (
+      <div className="flex justify-center">
+        <Button
+          onClick={() => setShowAnswer(!showAnswer)}
+          className="px-6 py-3"
+        >
+          {showAnswer ? "답변 숨기기" : "답변 확인하기"}
+        </Button>
+      </div>
+
+      {showAnswer && (
         <div className="mt-4 p-4 bg-[#404040] rounded">
           <strong>모범 답변:</strong>
           <p className="mt-2">{questionDetail.answer}</p>

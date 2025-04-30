@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -40,6 +41,7 @@ public class QnaService {
                 .answer(answer)
                 .scheduledDate(scheduledDate)
                 .isDeleted(false)
+                .reviewed(false)
                 .build();
 
         return qnaRepository.save(qna);
@@ -53,10 +55,12 @@ public class QnaService {
     // 사용자별 복습 대상 질문 조회
     @Transactional(readOnly = true)
     public List<QnaTodayResponse> getReviewQnasForToday(UUID userId) {
-        List<Qna> qnaList = qnaRepository.findByUserIdAndScheduledDateAndReviewedFalseAndIsDeletedFalse(userId, LocalDateTime.now());
-        return qnaList.stream()
-                .map(QnaTodayResponse::from)
-                .toList();
+        LocalDate today = LocalDate.now();
+        LocalDateTime start = today.atStartOfDay();
+        LocalDateTime end = today.atTime(23, 59, 59);
+        List<Qna> qnaList = qnaRepository
+                .findByUserIdAndScheduledDateBetweenAndReviewedFalseAndIsDeletedFalse(userId, start, end);
+        return qnaList.stream().map(QnaTodayResponse::from).toList();
     }
 
     // 사용자별 질문 삭제
@@ -70,7 +74,7 @@ public class QnaService {
         qna.markAsDeleted(); // soft delete
     }
 
-    //
+    // 질문 하나 조회
     public Qna findById(String id) {
         return qnaRepository.findById(UUID.fromString(id))
                 .orElseThrow(() -> new NotFoundException("QnA를 찾을 수 없습니다"));

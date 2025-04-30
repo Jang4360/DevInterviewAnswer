@@ -5,11 +5,13 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Button from "@/components/common/Button";
 import api from "@/utils/api";
+import useTodayReviews from "@/stores/useTodayReviews";
 
 export default function GeneratedReviewPage() {
   const [qnaList, setQnaList] = useState([]);
   const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
   const router = useRouter();
+  const { fetchReviews } = useTodayReviews();
 
   useEffect(() => {
     const savedQnA = localStorage.getItem("generatedQnA");
@@ -40,6 +42,7 @@ export default function GeneratedReviewPage() {
           answer: qna.answer,
         });
       }
+      await fetchReviews(userId);
 
       alert("질문 저장 완료!");
       localStorage.removeItem("generatedQnA");

@@ -16,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -123,14 +124,17 @@ public class QnaServiceTest {
                 .scheduledDate(LocalDateTime.now().minusDays(1))
                 .isDeleted(false)
                 .build();
+        LocalDate today = LocalDate.now();
+        LocalDateTime start = today.atStartOfDay();
+        LocalDateTime end = today.atTime(23, 59, 59);
 
-        when(qnaRepository.findByUserIdAndScheduledDateAndReviewedFalseAndIsDeletedFalse(eq(userId), any(LocalDateTime.class)))
+        when(qnaRepository.findByUserIdAndScheduledDateBetweenAndReviewedFalseAndIsDeletedFalse(eq(userId), start, end))
                 .thenReturn(List.of(qna));
 
         List<QnaTodayResponse> result = qnaService.getReviewQnasForToday(userId);
 
         assertEquals(1, result.size());
-        verify(qnaRepository).findByUserIdAndScheduledDateAndReviewedFalseAndIsDeletedFalse(eq(userId), any(LocalDateTime.class));
+        verify(qnaRepository).findByUserIdAndScheduledDateBetweenAndReviewedFalseAndIsDeletedFalse(eq(userId), start, end);
     }
 
     // 삭제 성공 테스트

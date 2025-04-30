@@ -67,9 +67,9 @@ public class QnaController {
         return ResponseEntity.noContent().build();
     }
 
+    // (QnA id로) 하나의 질문 데이터를 조회하는 로직
     @GetMapping("/{id}")
     public ResponseEntity<Qna> getQnaById(@PathVariable String id) {
-        // QnA 데이터를 조회하는 로직
         Qna qna = qnaService.findById(id);
         if (qna != null) {
             return ResponseEntity.ok(qna);

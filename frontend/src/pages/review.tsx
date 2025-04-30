@@ -6,12 +6,14 @@ import Modal from "@/components/common/Modal";
 import { FiTrash2 } from "react-icons/fi";
 import Link from "next/link";
 import api from "../utils/api";
+import useTodayReviews from "@/stores/useTodayReviews";
 
 export default function ReviewPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [data, setData] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const { removeReviewById } = useTodayReviews();
 
   useEffect(() => {
     const fetchQnAs = async () => {
@@ -43,6 +45,7 @@ export default function ReviewPage() {
     try {
       await api.delete(`/qna/${selectedId}?userId=${userId}`);
       setData(data.filter((item: any) => item.id !== selectedId));
+      removeReviewById(selectedId);
       setModalOpen(false);
       setSelectedId(null);
     } catch (error) {

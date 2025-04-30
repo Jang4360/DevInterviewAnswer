@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AiController {
     private final QuestionGenerationServiceImpl questionGenerationService;
 
+    // 질문 생성 API
     @PostMapping("/generate-questions")
     public ResponseEntity<GeneratedQnaResponse> generateQuestions(@RequestBody GenerateQuestionRequest request) {
         GeneratedQnaResponse response = questionGenerationService.generateQuestions(request);
