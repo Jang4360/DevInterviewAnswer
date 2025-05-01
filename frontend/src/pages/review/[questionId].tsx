@@ -60,7 +60,7 @@ export default function QuestionDetailPage() {
       <div className="flex justify-center">
         <Button
           onClick={() => setShowAnswer(!showAnswer)}
-          className="px-6 py-3"
+          className="cursor-pointer px-6 py-3"
         >
           {showAnswer ? "답변 숨기기" : "답변 확인하기"}
         </Button>
@@ -75,7 +75,10 @@ export default function QuestionDetailPage() {
 
       {fromSidebar && (
         <div className="flex justify-center mt-6">
-          <Button onClick={handleCompleteReview} className="px-6 py-3">
+          <Button
+            onClick={handleCompleteReview}
+            className="cursor-pointer px-6 py-3"
+          >
             복습 완료
           </Button>
         </div>

@@ -78,7 +78,7 @@ export default function GeneratedReviewPage() {
       ))}
 
       <div className="flex justify-center mt-6">
-        <Button onClick={handleSave} className="px-6 py-3">
+        <Button onClick={handleSave} className="cursor-pointer px-6 py-3">
           저장하기
         </Button>
       </div>

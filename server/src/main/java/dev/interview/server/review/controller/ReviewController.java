@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @RestController
@@ -40,5 +41,13 @@ public class ReviewController {
     public ResponseEntity<ReviewCountResponse> getReviewCountByUser(@PathVariable UUID userId) {
         Long count = reviewService.getReviewCounterByUser(userId);
         return ResponseEntity.ok(new ReviewCountResponse(count));
+    }
+
+    // 최근 복습일 조회 API
+    @GetMapping("/user/{userId}/latest")
+    @Operation(summary = "최근 복습일 조회", description = "특정 사용자의 가장 최근 복습일을 조회합니다")
+    public ResponseEntity<LocalDateTime> getLatestReviewDate(@PathVariable UUID userId) {
+        LocalDateTime latest = reviewService.getLatestReviewDate(userId);
+        return ResponseEntity.ok(latest);
     }
 }

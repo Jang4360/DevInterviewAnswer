@@ -43,8 +43,7 @@ public class EmbeddingServiceImpl implements EmbeddingService{
                     return Mono.error(new RuntimeException("429 Too Many Requests"));
                 })
                 .bodyToMono(Map.class)
-                .delaySubscription(Duration.ofSeconds(1))
-                .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(2))
+                .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(1))
                         .filter(throwable -> throwable instanceof RuntimeException &&
                                 throwable.getMessage().contains("429")))
                 .block();

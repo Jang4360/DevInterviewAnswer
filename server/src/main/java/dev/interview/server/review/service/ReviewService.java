@@ -63,4 +63,11 @@ public class ReviewService {
     public long getReviewCounterByUser(UUID userId) {
         return reviewRepository.countByUserId(userId);
     }
+
+    // 누적 질문 횟수 조회
+    public LocalDateTime getLatestReviewDate(UUID userId) {
+        return reviewRepository.findTopByUserIdOrderByReviewedAtDesc(userId)
+                .map(ReviewQueue::getReviewedAt)
+                .orElse(null);
+    }
 }

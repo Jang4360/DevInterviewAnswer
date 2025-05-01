@@ -5,18 +5,29 @@ import Input from "@/components/common/Input";
 import Button from "@/components/common/Button";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import api from "../utils/api"; // 새로 추가할 axios 인스턴스 import
+import api from "../utils/api";
 
 export default function SignupPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [emailError, setEmailError] = useState(false);
+  const [passwordMismatch, setPasswordMismatch] = useState(false);
+
   const router = useRouter();
 
   const handleSignup = async () => {
+    setEmailError(false);
+    setPasswordMismatch(false);
+
+    if (!email.includes("@")) {
+      setEmailError(true);
+      return;
+    }
+
     if (password !== confirmPassword) {
-      alert("비밀번호가 일치하지 않습니다.");
+      setPasswordMismatch(true);
       return;
     }
 
@@ -30,8 +41,8 @@ export default function SignupPage() {
       router.push("/login");
     } catch (error) {
       alert(
-        "회원가입 실패: " + (error as any).response?.data?.message ||
-          "서버 오류"
+        "회원가입 실패: " +
+          ((error as any).response?.data?.message || "서버 오류")
       );
     }
   };
@@ -65,8 +76,12 @@ export default function SignupPage() {
           onChange={(e) => setConfirmPassword(e.target.value)}
           placeholder="비밀번호 확인"
           type="password"
-          className="mb-6 w-full bg-[#303030]"
+          className="mb-4 w-full bg-[#303030]"
         />
+
+        {passwordMismatch && (
+          <p className="text-red-500 text-sm mb-4">비밀번호가 다릅니다.</p>
+        )}
 
         <Button onClick={handleSignup} className="w-full bg-[#303030]">
           회원가입

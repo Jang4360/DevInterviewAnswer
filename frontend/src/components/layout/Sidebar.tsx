@@ -4,7 +4,11 @@ import React, { useEffect } from "react";
 import Link from "next/link";
 import useTodayReviews from "@/stores/useTodayReviews";
 
-export default function Sidebar() {
+interface SidebarProps {
+  isSidebarOpen: boolean;
+}
+
+export default function Sidebar({ isSidebarOpen }: SidebarProps) {
   const { reviews, fetchReviews } = useTodayReviews();
 
   useEffect(() => {
@@ -13,12 +17,17 @@ export default function Sidebar() {
   }, [fetchReviews]);
 
   return (
-    <div className="w-60 bg-[#171717] text-white flex flex-col justify-between h-full p-4">
+    <div
+      className={`fixed top-0 left-0 h-full w-60 bg-[#171717] text-white flex flex-col justify-between p-4 z-40 
+      transform transition-transform duration-500 ease-in-out ${
+        isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+      }`}
+    >
       <div>
         <div className="flex items-center justify-between px-10 py-0">
           <h2 className="text-white text-lg font-bold">Today Review</h2>
         </div>
-        <div className="mt-4">
+        <div className="mt-6">
           <ul className="space-y-3">
             {reviews.length > 0 ? (
               reviews.map((review: any) => (
@@ -44,7 +53,6 @@ export default function Sidebar() {
           </ul>
         </div>
       </div>
-
       <div className="text-sm text-white opacity-50 mt-6">ⓒ DevInterview</div>
     </div>
   );

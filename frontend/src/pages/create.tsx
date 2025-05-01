@@ -46,7 +46,10 @@ export default function CreatePage() {
         className="w-full h-80 p-4 bg-[#303030] text-white rounded mb-4 placeholder-[#BBB5B5]"
       />
       <div className="flex justify-center">
-        <Button onClick={handleGenerateQnA} className="px-6 py-3">
+        <Button
+          onClick={handleGenerateQnA}
+          className="cursor-pointer px-6 py-3"
+        >
           인터뷰 질문 생성하기
         </Button>
       </div>

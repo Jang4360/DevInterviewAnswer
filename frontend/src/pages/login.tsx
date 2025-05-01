@@ -23,23 +23,31 @@ export default function LoginPage() {
 
       const { accessToken, refreshToken, userId } = res.data;
 
-      // JWT 저장
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("refreshToken", refreshToken);
-      localStorage.setItem("userId", userId); // 필요 시 저장
+      localStorage.setItem("userId", userId);
 
       alert("로그인 성공!");
       router.push("/review");
     } catch (error) {
       alert(
-        "로그인 실패: " + (error as any).response?.data?.message || "서버 오류"
+        "로그인 실패: " +
+          ((error as any).response?.data?.message || "서버 오류")
       );
     }
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault(); // 폼 제출 막기
+    handleLogin();
+  };
+
   return (
     <div className="flex items-center justify-center h-screen bg-[#212121] text-white">
-      <div className="w-full max-w-md bg-[#171717] p-8 rounded-lg shadow-lg">
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-md bg-[#171717] p-8 rounded-lg shadow-lg"
+      >
         <h2 className="text-3xl font-bold mb-8 text-center">Dev Interview</h2>
         <input
           type="email"
@@ -47,6 +55,7 @@ export default function LoginPage() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="w-full p-3 mb-4 bg-[#303030] text-white rounded placeholder-[#BBB5B5]"
+          required
         />
         <input
           type="password"
@@ -54,10 +63,11 @@ export default function LoginPage() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           className="w-full p-3 mb-6 bg-[#303030] text-white rounded placeholder-[#BBB5B5]"
+          required
         />
         <button
-          onClick={handleLogin}
-          className="w-full bg-[#303030] p-3 rounded hover:bg-[#404040] mb-4"
+          type="submit"
+          className="w-full bg-[#303030] p-3 rounded hover:bg-[#404040] mb-4 cursor-pointer"
         >
           로그인
         </button>
@@ -67,7 +77,7 @@ export default function LoginPage() {
         >
           회원가입 하기
         </p>
-      </div>
+      </form>
     </div>
   );
 }

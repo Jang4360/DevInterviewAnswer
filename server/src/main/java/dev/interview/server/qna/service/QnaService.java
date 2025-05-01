@@ -79,4 +79,8 @@ public class QnaService {
         return qnaRepository.findById(UUID.fromString(id))
                 .orElseThrow(() -> new NotFoundException("QnA를 찾을 수 없습니다"));
     }
+
+    public Long countByUser(UUID userId) {
+        return qnaRepository.countByUserIdAndIsDeletedFalse(userId);
+    }
 }

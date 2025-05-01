@@ -67,7 +67,7 @@ public class QnaController {
         return ResponseEntity.noContent().build();
     }
 
-    // (QnA id로) 하나의 질문 데이터를 조회하는 로직
+    // (QnA id로) 하나의 질문 데이터를 조회하는 API
     @GetMapping("/{id}")
     public ResponseEntity<Qna> getQnaById(@PathVariable String id) {
         Qna qna = qnaService.findById(id);
@@ -76,5 +76,13 @@ public class QnaController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    // 누적 질문 수 조회하는 API
+    @GetMapping("user/{userId}/count")
+    @Operation(summary = "사용자 질문 수 조회", description = "특정 사용자가 생성한 질문 개수를 조회합니다")
+    public ResponseEntity<Long> getQuestionCountByUSeer(@PathVariable UUID userId) {
+        Long count = qnaService.countByUser(userId);
+        return ResponseEntity.ok(count);
     }
 }

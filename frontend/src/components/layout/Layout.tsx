@@ -11,31 +11,27 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isAuthPage = pathname === "/login" || pathname === "/signup";
 
-  // 🔥 로그인/회원가입 페이지는 레이아웃 제외
-  if (isAuthPage) {
-    return <>{children}</>;
-  }
+  if (isAuthPage) return <>{children}</>;
 
   return (
-    <div className="flex h-screen bg-[#212121]">
-      {/* 🔥 왼쪽 상단 고정 버튼 */}
+    <div className="flex h-screen bg-[#212121] overflow-hidden relative ">
+      {/* 사이드바 토글 버튼 */}
       <button
         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        className="fixed top-4 left-4 z-50 text-white"
+        className="cursor-pointer fixed top-4 left-4 z-50 text-white hover:text-[#B3B3B3]"
       >
         <FiMenu size={24} />
       </button>
 
-      {/* 🔥 사이드바 */}
-      {isSidebarOpen && (
-        <Sidebar
-          isSidebarOpen={isSidebarOpen}
-          toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
-        />
-      )}
+      {/* 사이드바 */}
+      <Sidebar isSidebarOpen={isSidebarOpen} />
 
-      {/* 🔥 오른쪽 영역 */}
-      <div className="flex flex-col flex-1 transition-all duration-300">
+      {/* 오른쪽 컨텐츠 영역 */}
+      <div
+        className={`flex flex-col transition-all duration-500 ease-in-out ${
+          isSidebarOpen ? "ml-60" : "ml-0"
+        } w-full`}
+      >
         <Header toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} />
         <main className="p-6">{children}</main>
       </div>

@@ -20,4 +20,5 @@ public interface QnaRepository extends JpaRepository<Qna,UUID> {
             LocalDateTime end
     );
 
+    Long countByUserIdAndIsDeletedFalse(UUID userId);
 }

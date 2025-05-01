@@ -93,7 +93,7 @@ export default function ReviewPage() {
                   <button onClick={() => openModal(item.id)}>
                     <FiTrash2
                       size={16}
-                      className="text-white hover:text-red-500"
+                      className="cursor-pointer text-white hover:text-red-500"
                     />
                   </button>
                 </td>
