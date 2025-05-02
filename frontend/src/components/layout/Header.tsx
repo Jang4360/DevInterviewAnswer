@@ -1,13 +1,18 @@
 "use client";
-
+import { FC } from "react";
 import Link from "next/link";
 import { FiUser } from "react-icons/fi";
+interface HeaderProps {
+  toggleSidebar: () => void;
+}
 
-export default function Header() {
+const Header: FC<HeaderProps> = ({ toggleSidebar }) => {
   return (
     <header className="flex items-center justify-between bg-surface text-white px-6 py-4 border-b border-gray-700 w-full">
-      {/* 왼쪽 여백 - 비움 */}
-      <div className="w-24"></div>
+      {/* 왼쪽 - 토글 버튼 자리 */}
+      <div className="w-24">
+        <button onClick={toggleSidebar}>☰</button>
+      </div>
 
       {/* 중앙 DevInterview */}
       <div className="flex-1 flex justify-center">
@@ -37,4 +42,6 @@ export default function Header() {
       </div>
     </header>
   );
-}
+};
+
+export default Header;
