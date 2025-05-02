@@ -28,9 +28,8 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = QnaController.class, excludeAutoConfiguration = SecurityAutoConfiguration.class)
 @Import(QnaTestConfig.class)
@@ -184,4 +183,62 @@ public class QnaControllerTest extends RestDocsSupport {
                 .andExpect(status().isNoContent());
 
     }
+
+    @Test
+    @DisplayName("질문 단건 조회 API 성공 테스트")
+    void getQnaById_success() throws Exception {
+        // given
+        UUID qnaId = UUID.randomUUID();
+        Qna qna = Qna.builder()
+                .id(qnaId)
+                .question("Spring이란?")
+                .answer("Java 기반 프레임워크")
+                .build();
+
+        when(qnaService.findById(qnaId.toString())).thenReturn(qna);
+
+        // when & then
+        mockMvc.perform(get("/api/qna/{id}", qnaId))
+                .andDo(document("qna-get-success",
+                        pathParameters(
+                                parameterWithName("id").description("QnA ID")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").description("QnA ID"),
+                                fieldWithPath("question").description("질문 내용"),
+                                fieldWithPath("answer").description("답변 내용"),
+                                fieldWithPath("lastReviewedAt").optional().description("마지막 복습 일시"),
+                                fieldWithPath("scheduledDate").optional().description("다음 복습 예정 일자"),
+                                fieldWithPath("deleted").description("삭제 여부"),
+                                fieldWithPath("reviewed").description("복습 완료 여부"),
+                                fieldWithPath("writing").description("작성한 글 객체").optional(),
+                                fieldWithPath("user").description("작성자 객체").optional()
+                        )
+                ))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(qnaId.toString()))
+                .andExpect(jsonPath("$.question").value("Spring이란?"))
+                .andExpect(jsonPath("$.answer").value("Java 기반 프레임워크"));
+    }
+
+    @Test
+    @DisplayName("누적 질문 수 조회 API 성공 테스트")
+    void getQuestionCount_success() throws Exception {
+        // given
+        UUID userId = UUID.randomUUID();
+        Long count = 5L;
+
+        when(qnaService.countByUser(userId)).thenReturn(count);
+
+        // when & then
+        mockMvc.perform(get("/api/qna/user/{userId}/count", userId))
+                .andDo(document("qna-count-success",
+                        pathParameters(
+                                parameterWithName("userId").description("사용자 ID")
+                        )
+                ))
+                .andExpect(status().isOk())
+                .andExpect(content().string("5"));
+    }
+
 }

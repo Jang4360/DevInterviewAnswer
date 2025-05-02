@@ -121,20 +121,21 @@ public class QnaServiceTest {
         UUID userId = UUID.randomUUID();
         Qna qna = Qna.builder()
                 .id(UUID.randomUUID())
-                .scheduledDate(LocalDateTime.now().minusDays(1))
+                .scheduledDate(LocalDateTime.now())
                 .isDeleted(false)
+                .reviewed(false)
                 .build();
         LocalDate today = LocalDate.now();
         LocalDateTime start = today.atStartOfDay();
         LocalDateTime end = today.atTime(23, 59, 59);
 
-        when(qnaRepository.findByUserIdAndScheduledDateBetweenAndReviewedFalseAndIsDeletedFalse(eq(userId), start, end))
+        when(qnaRepository.findByUserIdAndScheduledDateBetweenAndReviewedFalseAndIsDeletedFalse(eq(userId), eq(start), eq(end)))
                 .thenReturn(List.of(qna));
 
         List<QnaTodayResponse> result = qnaService.getReviewQnasForToday(userId);
 
         assertEquals(1, result.size());
-        verify(qnaRepository).findByUserIdAndScheduledDateBetweenAndReviewedFalseAndIsDeletedFalse(eq(userId), start, end);
+        verify(qnaRepository).findByUserIdAndScheduledDateBetweenAndReviewedFalseAndIsDeletedFalse(eq(userId), eq(start), eq(end));
     }
 
     // 삭제 성공 테스트
@@ -186,5 +187,42 @@ public class QnaServiceTest {
         assertThrows(ForbiddenException.class, () -> {
             qnaService.deleteQna(qnaId, userId);
         });
+    }
+
+    // QnA 단일 조회 성공
+    @Test
+    void findById_success() {
+        UUID qnaId = UUID.randomUUID();
+        Qna qna = Qna.builder().id(qnaId).question("Test?").build();
+
+        when(qnaRepository.findById(qnaId)).thenReturn(Optional.of(qna));
+
+        Qna result = qnaService.findById(qnaId.toString());
+
+        assertEquals("Test?", result.getQuestion());
+        verify(qnaRepository).findById(qnaId);
+    }
+
+    // QnA 단일 조회 실패
+    @Test
+    void findById_fail() {
+        UUID qnaId = UUID.randomUUID();
+
+        when(qnaRepository.findById(qnaId)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> qnaService.findById(qnaId.toString()));
+    }
+
+    // 질문 수 카운트 성공
+    @Test
+    void countByUser_success() {
+        UUID userId = UUID.randomUUID();
+
+        when(qnaRepository.countByUserIdAndIsDeletedFalse(userId)).thenReturn(5L);
+
+        Long count = qnaService.countByUser(userId);
+
+        assertEquals(5L,count);
+        verify(qnaRepository).countByUserIdAndIsDeletedFalse(userId);
     }
 }

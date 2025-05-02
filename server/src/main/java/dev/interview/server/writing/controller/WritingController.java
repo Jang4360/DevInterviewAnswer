@@ -30,6 +30,7 @@ public class WritingController {
                 .body(WritingCreateResponse.from(saved));
     }
 
+    // 글 조회 API
     @GetMapping("/{id}")
     public ResponseEntity<WritingCreateResponse> getWriting(@PathVariable UUID id) {
         WritingCreateResponse response = writingService.findById(id);

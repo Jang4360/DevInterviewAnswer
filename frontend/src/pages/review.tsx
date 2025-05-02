@@ -7,8 +7,10 @@ import { FiTrash2 } from "react-icons/fi";
 import Link from "next/link";
 import api from "../utils/api";
 import useTodayReviews from "@/stores/useTodayReviews";
+import useAuthGuard from "@/hooks/useAuthGuard";
 
 export default function ReviewPage() {
+  useAuthGuard();
   const [searchTerm, setSearchTerm] = useState("");
   const [data, setData] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);

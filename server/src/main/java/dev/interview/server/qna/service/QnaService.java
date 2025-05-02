@@ -80,6 +80,7 @@ public class QnaService {
                 .orElseThrow(() -> new NotFoundException("QnA를 찾을 수 없습니다"));
     }
 
+    // 전체 질문수 조회
     public Long countByUser(UUID userId) {
         return qnaRepository.countByUserIdAndIsDeletedFalse(userId);
     }

@@ -4,6 +4,7 @@ import dev.interview.server.global.exception.NotFoundException;
 import dev.interview.server.user.domain.User;
 import dev.interview.server.user.repository.UserRepository;
 import dev.interview.server.writing.domain.Writing;
+import dev.interview.server.writing.dto.WritingCreateResponse;
 import dev.interview.server.writing.repository.WritingRepository;
 import dev.interview.server.writing.service.WritingService;
 import org.junit.jupiter.api.Test;
@@ -32,27 +33,34 @@ public class WritingServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    // 글 조회 성공
     @Test
     void getWritingsByUserId_success() {
         // given
         UUID userId = UUID.randomUUID();
+        UUID writingId = UUID.randomUUID();
+        String content = "Spring study";
+
+        User user = User.builder().id(userId).build();
+
         Writing writing = Writing.builder()
-                .id(UUID.randomUUID())
-                .content("Spring Study")
-                .user(User.builder().id(userId).build())
+                .id(writingId)
+                .content(content)
+                .user(user)
                 .build();
 
-        when(writingRepository.findAllByUserId(userId)).thenReturn(List.of(writing));
+        when(writingRepository.findById(writingId)).thenReturn(Optional.of(writing));
 
         // when
-        List<Writing> writings = writingService.getWritingsByUserId(userId);
+        WritingCreateResponse response = writingService.findById(writingId);
 
         // then
-        assertEquals(1, writings.size());
-        assertEquals("Spring Study", writings.get(0).getContent());
-        verify(writingRepository).findAllByUserId(userId);
+        assertEquals(content, response.content());
+        assertEquals(writingId, response.id());
+        verify(writingRepository).findById(writingId);
     }
 
+    // 글 생성 성공
     @Test
     void createWriting_success() {
         // given
@@ -75,6 +83,7 @@ public class WritingServiceTest {
         verify(writingRepository).save(any(Writing.class));
     }
 
+    // 글 생성 실패
     @Test
     void createWriting_userNotFound() {
         // given

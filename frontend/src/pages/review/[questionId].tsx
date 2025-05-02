@@ -5,8 +5,10 @@ import { useRouter } from "next/router";
 import Button from "@/components/common/Button";
 import api from "@/utils/api";
 import useTodayReviews from "@/stores/useTodayReviews";
+import useAuthGuard from "@/hooks/useAuthGuard";
 
 export default function QuestionDetailPage() {
+  useAuthGuard();
   const router = useRouter();
   const { questionId, fromSidebar } = router.query;
   const [questionDetail, setQuestionDetail] = useState(null);

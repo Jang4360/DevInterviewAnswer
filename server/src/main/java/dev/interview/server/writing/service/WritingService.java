@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.UUID;
 
 // 글 작성 관련 비즈니스 로직
@@ -27,6 +26,7 @@ public class WritingService {
 
         return WritingCreateResponse.from(writing);
     }
+
     // 글 작성 저장
     @Transactional
     public Writing createWriting(UUID userId, String content) {

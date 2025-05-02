@@ -5,6 +5,7 @@ import dev.interview.server.user.domain.User;
 import dev.interview.server.writing.controller.WritingController;
 import dev.interview.server.writing.domain.Writing;
 import dev.interview.server.writing.dto.WritingCreateRequest;
+import dev.interview.server.writing.dto.WritingCreateResponse;
 import dev.interview.server.writing.service.WritingService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,6 +15,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -67,4 +71,35 @@ public class WritingControllerTest extends RestDocsSupport {
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.content").value(content));
     }
+
+    @DisplayName("글 단건 조회 API 테스트")
+    @Test
+    void getWriting_success() throws Exception {
+        // given
+        UUID writingId = UUID.randomUUID();
+        UUID userId = UUID.randomUUID();
+        WritingCreateResponse response = new WritingCreateResponse(writingId,"작성한 글입니다.",userId);
+
+        when(writingService.findById(writingId)).thenReturn(response);
+
+        // when & then
+        mockMvc.perform(get("/api/writings/{id}", writingId))
+                .andDo(document("writing-get-success",
+                        pathParameters(
+                                parameterWithName("id").description("글 ID")
+                        ),
+                        responseFields(
+                                fieldWithPath("id").description("글 ID"),
+                                fieldWithPath("content").description("글 내용"),
+                                fieldWithPath("userId").description("작성한 사용자")
+
+                        )
+                ))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(writingId.toString()))
+                .andExpect(jsonPath("$.content").value("작성한 글입니다."))
+                .andExpect(jsonPath("$.userId").value(userId.toString()));
+
+    }
+
 }

@@ -14,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -113,5 +114,41 @@ public class ReviewServiceTest {
 
         // then
         assertEquals(10L, count);
+    }
+
+    @Test
+    void getLatestReviewDate_success() {
+        //given
+        UUID userId = UUID.randomUUID();
+        LocalDateTime now = LocalDateTime.now();
+        ReviewQueue latestReview = ReviewQueue.builder()
+                .user(User.builder().id(userId).build())
+                .reviewedAt(now)
+                .build();
+
+        when(reviewRepository.findTopByUserIdOrderByReviewedAtDesc(userId))
+                .thenReturn(Optional.of(latestReview));
+
+        // when
+        LocalDateTime result = reviewService.getLatestReviewDate(userId);
+
+        // then
+        assertEquals(now,result);
+        verify(reviewRepository).findTopByUserIdOrderByReviewedAtDesc(userId);
+    }
+
+    @Test
+    void getLatestReviewDate_notFound() {
+        // given
+        UUID userId = UUID.randomUUID();
+        when(reviewRepository.findTopByUserIdOrderByReviewedAtDesc(userId))
+                .thenReturn(Optional.empty());
+
+        // when
+        LocalDateTime result = reviewService.getLatestReviewDate(userId);
+
+        // then
+        assertNull(result);
+        verify(reviewRepository).findTopByUserIdOrderByReviewedAtDesc(userId);
     }
 }

@@ -12,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static org.mockito.Mockito.doNothing;
@@ -103,4 +104,25 @@ public class ReviewControllerTest extends RestDocsSupport {
                 .andExpect(jsonPath("$.count").value(count));
 
     }
+
+    @DisplayName("최근 복습일 조회 API 테스트")
+    @Test
+    void getLatestReviewDate_success() throws Exception {
+        // given
+        UUID userId = UUID.randomUUID();
+        LocalDateTime recent = LocalDateTime.of(2025, 5, 1, 12, 0,0);
+
+        when(reviewService.getLatestReviewDate(userId)).thenReturn(recent);
+
+        // when & then
+        mockMvc.perform(get("/api/review/user/{userId}/latest", userId))
+                .andDo(document("review-latest-success",
+                        pathParameters(
+                                parameterWithName("userId").description("사용자 ID")
+                        )
+                ))
+                .andExpect(status().isOk())
+                .andExpect(content().string("\"2025-05-01T12:00:00\""));
+    }
+
 }

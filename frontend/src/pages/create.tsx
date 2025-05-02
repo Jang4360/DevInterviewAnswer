@@ -4,8 +4,10 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Button from "@/components/common/Button";
 import api from "../utils/api";
+import useAuthGuard from "@/hooks/useAuthGuard";
 
 export default function CreatePage() {
+  useAuthGuard();
   const [content, setContent] = useState("");
   const router = useRouter();
 

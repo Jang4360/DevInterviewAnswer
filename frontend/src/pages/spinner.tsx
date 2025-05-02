@@ -4,8 +4,10 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Spinner from "@/components/common/Spinner";
 import api from "@/utils/api";
+import useAuthGuard from "@/hooks/useAuthGuard";
 
 export default function SpinnerPage() {
+  useAuthGuard();
   const router = useRouter();
 
   useEffect(() => {

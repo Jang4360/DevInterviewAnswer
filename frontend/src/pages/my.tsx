@@ -3,8 +3,10 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import api from "@/utils/api";
+import useAuthGuard from "@/hooks/useAuthGuard";
 
 export default function MyPage() {
+  useAuthGuard();
   const router = useRouter();
   const [questionCount, setQuestionCount] = useState<number | null>(null);
   const [reviewCount, setReviewCount] = useState<number | null>(null);
