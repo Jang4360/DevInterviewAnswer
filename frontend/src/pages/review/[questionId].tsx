@@ -8,12 +8,20 @@ import useTodayReviews from "@/stores/useTodayReviews";
 import useAuthGuard from "@/hooks/useAuthGuard";
 
 export default function QuestionDetailPage() {
+  type QuestionDetail = {
+    id: string;
+    question: string;
+    answer: string;
+  };
   useAuthGuard();
   const router = useRouter();
   const { questionId, fromSidebar } = router.query;
-  const [questionDetail, setQuestionDetail] = useState(null);
+  const [questionDetail, setQuestionDetail] = useState<QuestionDetail | null>(
+    null
+  );
   const [showAnswer, setShowAnswer] = useState(false);
   const { removeReviewById } = useTodayReviews();
+  const fromSidebar = router.query.fromSidebar === "true";
 
   useEffect(() => {
     if (!router.isReady || !questionId) return;

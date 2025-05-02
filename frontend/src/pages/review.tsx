@@ -47,7 +47,9 @@ export default function ReviewPage() {
     try {
       await api.delete(`/qna/${selectedId}?userId=${userId}`);
       setData(data.filter((item: any) => item.id !== selectedId));
-      removeReviewById(selectedId);
+      if (selectedId) {
+        removeReviewById(selectedId);
+      }
       setModalOpen(false);
       setSelectedId(null);
     } catch (error) {
