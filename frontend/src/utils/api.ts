@@ -1,7 +1,8 @@
 import axios from "axios";
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 const api = axios.create({
-  baseURL: "http://localhost:8080/api",
+  baseURL: `${API_BASE_URL}/api`,
 });
 
 // 요청 시 토큰 자동 삽입
