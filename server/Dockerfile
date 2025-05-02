@@ -1,14 +1,17 @@
-# 1. JDK 17 기반 이미지 사용
-FROM openjdk:17
+# 1단계: 빌드
+FROM gradle:8.5.0-jdk17 AS build
+WORKDIR /app
+COPY --chown=gradle:gradle . .
+RUN gradle clean build -x test
 
-# 2. 작업 디렉토리 생성
+# 2단계: 실제 실행 환경
+FROM eclipse-temurin:17-jdk
 WORKDIR /app
 
-# 3. 빌드된 JAR 파일 복사
-COPY build/libs/*.jar app.jar
+# 빌드 단계에서 생성한 JAR 복사
+COPY --from=build /app/build/libs/*.jar app.jar
 
-# 4. 8080 포트 열기 (Spring Boot 기본 포트)
 EXPOSE 8080
 
-# 5. JAR 실행
+# 실행 명령어
 ENTRYPOINT ["java", "-jar", "app.jar"]
