@@ -32,3 +32,4 @@ openai:
 qdrant:
   api:
     url: ${QDRANT_API_URL}
+    key: ${QDRANT_API_KEY}
