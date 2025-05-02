@@ -15,13 +15,13 @@ export default function QuestionDetailPage() {
   };
   useAuthGuard();
   const router = useRouter();
-  const { questionId, fromSidebar } = router.query;
+  const questionId = router.query.questionId;
+  const fromSidebar = router.query.fromSidebar === "true";
   const [questionDetail, setQuestionDetail] = useState<QuestionDetail | null>(
     null
   );
   const [showAnswer, setShowAnswer] = useState(false);
   const { removeReviewById } = useTodayReviews();
-  const fromSidebar = router.query.fromSidebar === "true";
 
   useEffect(() => {
     if (!router.isReady || !questionId) return;
@@ -39,6 +39,7 @@ export default function QuestionDetailPage() {
 
   const handleCompleteReview = async () => {
     const userId = localStorage.getItem("userId");
+    if (!questionDetail) return;
     try {
       await api.post(`/review`, {
         userId: userId,
