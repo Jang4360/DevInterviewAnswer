@@ -22,9 +22,19 @@ public class QdrantVectorDBClient implements VectorDBClient {
     private final WebClient webClient;
 
     @Value("${qdrant.api.url}")
-    private String qdrantApiUrl; // http://localhost:6333
+    private String qdrantApiUrl;
+
+    @Value("${qdrant.api.key}")
+    private String qdrantApiKey;
 
     private static final String COLLECTION_NAME = "user_vectors";
+
+    private HttpHeaders getAuthHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("api-key", qdrantApiKey);  // ✅ KEY 설정
+        return headers;
+    }
 
     // Qdrant 컬렉션 초기화 (없으면 생성)
     @PostConstruct
@@ -43,26 +53,18 @@ public class QdrantVectorDBClient implements VectorDBClient {
         try {
             webClient.put()
                     .uri(url)
-                    .contentType(MediaType.APPLICATION_JSON)
+                    .headers(headers -> headers.addAll(getAuthHeaders()))
                     .bodyValue(requestBody)
                     .retrieve()
-                    .onStatus(HttpStatus.TOO_MANY_REQUESTS::equals, clientResponse -> {
-                        return Mono.error(new RuntimeException("429 Too Many Requests"));
-                    })
                     .bodyToMono(Void.class)
-                    .delaySubscription(Duration.ofSeconds(1))
-                    .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(2))
-                            .filter(throwable -> throwable instanceof RuntimeException &&
-                                    throwable.getMessage().contains("429")))
                     .block();
 
-            log.info("Qdrant 컬렉션 생성 완료.");
+            log.info("✅ Qdrant 컬렉션 생성 완료");
         } catch (Exception e) {
-            log.warn("Qdrant 컬렉션 생성 실패 또는 이미 존재: {}", e.getMessage());
+            log.warn("⚠️ Qdrant 컬렉션 생성 실패 또는 이미 존재: {}", e.getMessage());
         }
     }
 
-    // 임베딩과 요약을 Qdrant에 저장
     @Override
     public void saveEmbedding(UUID userId, String summary, List<Float> embedding) {
         String url = qdrantApiUrl + "/collections/" + COLLECTION_NAME + "/points";
@@ -82,22 +84,15 @@ public class QdrantVectorDBClient implements VectorDBClient {
 
         Map response = webClient.put()
                 .uri(url)
-                .contentType(MediaType.APPLICATION_JSON)
+                .headers(headers -> headers.addAll(getAuthHeaders()))
                 .bodyValue(requestBody)
                 .retrieve()
-                .onStatus(HttpStatus.TOO_MANY_REQUESTS::equals, clientResponse -> {
-                    return Mono.error(new RuntimeException("429 Too Many Requests"));
-                })
                 .bodyToMono(Map.class)
-                .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(1))
-                        .filter(throwable -> throwable instanceof RuntimeException &&
-                                throwable.getMessage().contains("429")))
                 .block();
 
-        log.info("Qdrant 저장 응답: {}", response);
+        log.info("✅ Qdrant 저장 응답: {}", response);
     }
 
-    // Qdrant에서 유사한 글 요약 검색
     @Override
     public List<String> searchSimilarSummaries(UUID userId, List<Float> embedding) {
         String url = qdrantApiUrl + "/collections/" + COLLECTION_NAME + "/points/search";
@@ -114,17 +109,10 @@ public class QdrantVectorDBClient implements VectorDBClient {
 
         Map response = webClient.post()
                 .uri(url)
-                .contentType(MediaType.APPLICATION_JSON)
+                .headers(headers -> headers.addAll(getAuthHeaders()))
                 .bodyValue(requestBody)
                 .retrieve()
-                .onStatus(HttpStatus.TOO_MANY_REQUESTS::equals, clientResponse -> {
-                    return Mono.error(new RuntimeException("429 Too Many Requests"));
-                })
                 .bodyToMono(Map.class)
-                .delaySubscription(Duration.ofSeconds(1))
-                .retryWhen(Retry.fixedDelay(1, Duration.ofSeconds(1))
-                        .filter(throwable -> throwable instanceof RuntimeException &&
-                                throwable.getMessage().contains("429")))
                 .block();
 
         List<Map<String, Object>> result = (List<Map<String, Object>>) response.get("result");
@@ -135,7 +123,7 @@ public class QdrantVectorDBClient implements VectorDBClient {
             if (payload != null && payload.get("summary") != null) {
                 summaries.add((String) payload.get("summary"));
             } else {
-                log.warn("⚠️ payload가 null이거나 summary 없음: {}", item);
+                log.warn("⚠️ payload 누락: {}", item);
             }
         }
 
