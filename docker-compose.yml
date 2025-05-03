@@ -1,0 +1,48 @@
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: backend
+    expose:
+      - "8080"
+    env_file:
+      - .env
+    depends_on:
+      - qdrant
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: frontend
+    expose:
+      - "3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=https://yourdomain.com/api
+    depends_on:
+      - backend
+
+  qdrant:
+    image: qdrant/qdrant
+    container_name: qdrant
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_data:/qdrant/storage
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/cert:/etc/nginx/cert
+    depends_on:
+      - frontend
+      - backend
+
+volumes:
+  qdrant_data:
