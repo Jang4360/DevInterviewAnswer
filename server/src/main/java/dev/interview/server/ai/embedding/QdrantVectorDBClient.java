@@ -8,10 +8,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
-import reactor.util.retry.Retry;
-
-import java.time.Duration;
 import java.util.*;
 
 @Profile("!test")
@@ -24,17 +20,9 @@ public class QdrantVectorDBClient implements VectorDBClient {
     @Value("${qdrant.api.url}")
     private String qdrantApiUrl;
 
-    @Value("${qdrant.api.key}")
-    private String qdrantApiKey;
 
     private static final String COLLECTION_NAME = "user_vectors";
 
-    private HttpHeaders getAuthHeaders() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("api-key", qdrantApiKey);  // ✅ KEY 설정
-        return headers;
-    }
 
     // Qdrant 컬렉션 초기화 (없으면 생성)
     @PostConstruct
@@ -53,7 +41,7 @@ public class QdrantVectorDBClient implements VectorDBClient {
         try {
             webClient.put()
                     .uri(url)
-                    .headers(headers -> headers.addAll(getAuthHeaders()))
+                    .contentType(MediaType.APPLICATION_JSON)
                     .bodyValue(requestBody)
                     .retrieve()
                     .bodyToMono(Void.class)
@@ -84,7 +72,7 @@ public class QdrantVectorDBClient implements VectorDBClient {
 
         Map response = webClient.put()
                 .uri(url)
-                .headers(headers -> headers.addAll(getAuthHeaders()))
+                .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(requestBody)
                 .retrieve()
                 .bodyToMono(Map.class)
@@ -109,7 +97,7 @@ public class QdrantVectorDBClient implements VectorDBClient {
 
         Map response = webClient.post()
                 .uri(url)
-                .headers(headers -> headers.addAll(getAuthHeaders()))
+                .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(requestBody)
                 .retrieve()
                 .bodyToMono(Map.class)
