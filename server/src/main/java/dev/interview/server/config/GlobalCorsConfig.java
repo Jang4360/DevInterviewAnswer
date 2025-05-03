@@ -13,7 +13,7 @@ public class GlobalCorsConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/api/**")
-                        .allowedOrigins("http://localhost:3000")
+                        .allowedOrigins("https://devinterviewanswer-frontend.onrender.com")
                         .allowedMethods("GET", "POST", "PUT","PATCH", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .allowCredentials(true);
