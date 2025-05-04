@@ -21,7 +21,7 @@ services:
     expose:
       - "3000"
     env_file:
-      - .env
+      - ./frontend/.env
     depends_on:
       - backend
 
