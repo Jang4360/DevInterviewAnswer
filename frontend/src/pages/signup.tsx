@@ -17,7 +17,8 @@ export default function SignupPage() {
 
   const router = useRouter();
 
-  const handleSignup = async () => {
+  const handleSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
     setEmailError(false);
     setPasswordMismatch(false);
 
