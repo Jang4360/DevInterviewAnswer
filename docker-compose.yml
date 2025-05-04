@@ -20,6 +20,8 @@ services:
     container_name: frontend
     expose:
       - "3000"
+    env_file:
+      - .env
     environment:
       - NEXT_PUBLIC_API_URL=https://yourdomain.com/api
     depends_on:
