@@ -2,7 +2,8 @@
 FROM gradle:8.5.0-jdk17 AS build
 WORKDIR /app
 COPY --chown=gradle:gradle . .
-RUN gradle clean build -x test
+RUN gradle clean build -x test --console=plain --no-daemon
+
 
 # 2단계: 실제 실행 환경
 FROM eclipse-temurin:17-jdk
