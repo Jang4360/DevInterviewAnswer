@@ -1,7 +1,7 @@
 # 1단계: 빌드
 FROM gradle:8.5.0-jdk17 AS build
 WORKDIR /app
-COPY --chown=gradle:gradle server/ . 
+COPY --chown=gradle:gradle . .
 RUN gradle clean build -x test
 
 # 2단계: 실제 실행 환경
