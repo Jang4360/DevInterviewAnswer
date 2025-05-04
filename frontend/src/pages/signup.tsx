@@ -84,9 +84,12 @@ export default function SignupPage() {
           <p className="text-red-500 text-sm mb-4">비밀번호가 다릅니다.</p>
         )}
 
-        <Button onClick={handleSignup} className="w-full bg-[#303030]">
-          회원가입
-        </Button>
+        <form onSubmit={handleSignup}>
+          {/* 인풋 필드들 */}
+          <Button type="submit" className="w-full bg-[#303030]">
+            회원가입
+          </Button>
+        </form>
 
         <p className="text-center text-gray-400 mt-4">
           이미 계정이 있으신가요?{" "}
