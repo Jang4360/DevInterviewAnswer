@@ -9,7 +9,7 @@ FROM eclipse-temurin:17-jdk
 WORKDIR /app
 
 # 빌드 단계에서 생성한 JAR 복사
-COPY --from=build /app/build/libs/interview-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=build /app/build/libs/server-0.0.1-SNAPSHOT.jar app.jar
 
 
 EXPOSE 8080
