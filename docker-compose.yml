@@ -41,7 +41,7 @@ services:
       - "443:443"
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
-      - /etc/letsencrypt/live/devinterview.shop:/etc/nginx/cert
+      - /etc/letsencrypt/archive/devinterview.shop:/etc/nginx/cert
     depends_on:
       - frontend
       - backend
