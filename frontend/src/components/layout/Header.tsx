@@ -12,7 +12,7 @@ const Header: FC<HeaderProps> = ({ toggleSidebar }) => {
       {/* 중앙 DevInterview */}
       <div className="flex-1 flex justify-center">
         <Link href="/review">
-          <h1 className="text-xl font-bold cursor-pointer ml-8 hover:text-[#B3B3B3]">
+          <h1 className="text-xl font-bold cursor-pointer ml-32 hover:text-[#B3B3B3]">
             Dev Interview
           </h1>
         </Link>
