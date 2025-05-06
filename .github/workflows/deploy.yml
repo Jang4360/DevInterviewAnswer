@@ -2,7 +2,7 @@ name: Deploy to EC2
 
 on:
   push:
-    branches: [main] # 혹은 배포 브랜치 이름
+    branches: [main]
 
 jobs:
   deploy:
@@ -16,19 +16,25 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
-            # EC2 접속 후 명령어 실행
-            cd ~/interview-platform || git clone https://github.com/<your-id>/<your-repo>.git ~/interview-platform
+            # 기존 디렉토리로 이동 또는 클론
+            if [ ! -d "~/interview-platform" ]; then
+              git clone https://github.com/${{ secrets.REPO_OWNER }}/${{ secrets.REPO_NAME }} ~/interview-platform
+            fi
             cd ~/interview-platform
 
-            # 최신 코드 반영
+            # 최신 코드 가져오기
             git pull origin main
 
-            # 환경 변수 작성 (최초 1회만 수동 작성해놓는 것도 가능)
-            echo "${{ secrets.ENV_FILE }}" > .env
+            # .env 파일 덮어쓰기 (백엔드, 프론트엔드 공통 설정)
+            echo "${{ secrets.ENV_FILE_ROOT }}" > .env
+            echo "${{ secrets.ENV_FILE_FRONT }}" > ./frontend/.env
 
-            # 컨테이너 재빌드 및 실행
+            # Docker 클린 배포
             docker-compose down
             docker-compose pull
-            docker-compose up -d --build
+            docker system prune -a --volumes -f
+            docker-compose build --no-cache
+            docker-compose up -d
 
+            # 불필요한 이미지 삭제
             docker image prune -f
