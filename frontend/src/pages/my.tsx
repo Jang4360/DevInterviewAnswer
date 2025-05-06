@@ -48,10 +48,10 @@ export default function MyPage() {
   };
 
   return (
-    <div className="p-6 text-white flex flex-col items-center mt-10 bg-[#212121]">
+    <div className="p-6 text-white flex flex-col items-center mt-10 bg-[#212121] w-full overflow-x-hidden">
       <h2 className="text-3xl font-bold mb-6">마이페이지</h2>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-3xl mb-8 mt-10">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full px-4 sm:px-0 max-w-3xl mb-8 mt-10">
         <div className="bg-[#2a2a2a] p-6 rounded-lg shadow-md text-center">
           <h3 className="text-lg font-semibold mb-2">누적 질문 수</h3>
           <p className="text-2xl font-bold">
