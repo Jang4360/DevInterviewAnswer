@@ -16,25 +16,29 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
-            # 기존 디렉토리로 이동 또는 클론
+            # 1. 시스템 nginx 중지 (도커 nginx와 포트 충돌 방지)
+            sudo systemctl stop nginx || true
+            sudo systemctl disable nginx || true
+
+            # 2. 프로젝트 폴더로 이동 또는 클론
             if [ ! -d "~/interview-platform" ]; then
               git clone https://github.com/${{ secrets.REPO_OWNER }}/${{ secrets.REPO_NAME }} ~/interview-platform
             fi
             cd ~/interview-platform
 
-            # 최신 코드 가져오기
+            # 3. 최신 코드 가져오기
             git pull origin main
 
-            # .env 파일 덮어쓰기 (백엔드, 프론트엔드 공통 설정)
+            # 4. .env 파일 반영
             echo "${{ secrets.ENV_FILE_ROOT }}" > .env
             echo "${{ secrets.ENV_FILE_FRONT }}" > ./frontend/.env
 
-            # Docker 클린 배포
+            # 5. Docker 클린 배포
             docker-compose down
             docker-compose pull
             docker system prune -a --volumes -f
             docker-compose build --no-cache
             docker-compose up -d
 
-            # 불필요한 이미지 삭제
+            # 6. 이미지 정리
             docker image prune -f
