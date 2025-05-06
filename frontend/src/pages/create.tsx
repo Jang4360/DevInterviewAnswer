@@ -37,7 +37,7 @@ export default function CreatePage() {
       alert("글 저장 실패!");
     }
   };
-
+    //
   return (
     <div className="p-6 text-white">
       <h2 className="text-xl font-bold mb-4">글 작성</h2>
