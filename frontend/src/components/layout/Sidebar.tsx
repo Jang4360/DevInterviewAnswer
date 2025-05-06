@@ -19,13 +19,16 @@ export default function Sidebar({ isSidebarOpen }: SidebarProps) {
   return (
     <div
       className={`fixed top-0 left-0 h-full w-60 bg-[#171717] text-white flex flex-col justify-between p-4 z-40 
-      transform transition-transform duration-500 ease-in-out ${
+      transform transition-transform duration-500 ease-in-out
+      ${
         isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-      }`}
+      } sm:translate-x-0`}
     >
       <div>
-        <div className="flex items-center justify-between px-10 py-0">
-          <h2 className="text-white text-lg font-bold">Today Review</h2>
+        <div className="flex items-center justify-between px-4 sm:px-10 py-0">
+          <h2 className="text-white text-base sm:text-lg font-bold">
+            Today Review
+          </h2>
         </div>
         <div className="mt-6">
           <ul className="space-y-3">
