@@ -34,7 +34,7 @@ export default function CreatePage() {
       router.push("/spinner");
     } catch (error) {
       console.error(error);
-      alert("글 저장 실패!");
+      alert("글 저장 실패");
     }
   };
     //
