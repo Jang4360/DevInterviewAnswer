@@ -71,8 +71,8 @@ export default function ReviewPage() {
       </div>
 
       {/* QnA 리스트 */}
-      <div className="bg-[#303030] rounded-lg p-4 overflow-x-auto">
-        <table className="min-w-[600px] text-left text-white">
+      <div className="bg-[#303030] rounded-lg p-4 ">
+        <table className="w-full text-left text-white">
           <thead>
             <tr className="border-b border-gray-600">
               <th className="p-2">면접 질문</th>
