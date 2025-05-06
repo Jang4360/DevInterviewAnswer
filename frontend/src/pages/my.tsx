@@ -48,7 +48,7 @@ export default function MyPage() {
   };
 
   return (
-    <div className="p-6 text-white flex flex-col items-center mt-10 bg-[#212121] w-full overflow-x-hidden">
+    <div className="p-6 text-white flex flex-col items-center mt-10 bg-[#212121] w-full overflow-x-auto pb-20">
       <h2 className="text-3xl font-bold mb-6">마이페이지</h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full px-4 sm:px-0 max-w-3xl mb-8 mt-10">

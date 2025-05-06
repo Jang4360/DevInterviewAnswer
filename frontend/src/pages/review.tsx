@@ -72,46 +72,50 @@ export default function ReviewPage() {
 
       {/* QnA 리스트 */}
       <div className="bg-[#303030] rounded-lg p-4 overflow-x-auto">
-        <table className="min-w-[600px] text-left text-white">
-          <thead>
-            <tr className="border-b border-gray-600">
-              <th className="p-2">면접 질문</th>
-              <th className="p-2">예정 리뷰일</th>
-              <th className="p-0">삭제</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredData.map((item: any) => (
-              <tr key={item.id} className="border-b border-gray-700">
-                <td className="p-2">
-                  <Link href={`/review/${item.id}`}>
-                    <p className="text-white hover:underline">
-                      {item.question}
-                    </p>
-                  </Link>
-                </td>
-                <td className="p-2">
-                  {item.scheduleDate ? item.scheduleDate.split("T")[0] : "없음"}
-                </td>
-                <td className="p-4">
-                  <button onClick={() => openModal(item.id)}>
-                    <FiTrash2
-                      size={16}
-                      className="cursor-pointer text-white hover:text-red-500"
-                    />
-                  </button>
-                </td>
+        <div className="min-w-[600px]">
+          <table className="min-w-[600px] text-left text-white">
+            <thead>
+              <tr className="border-b border-gray-600">
+                <th className="p-2">면접 질문</th>
+                <th className="p-2">예정 리뷰일</th>
+                <th className="p-0">삭제</th>
               </tr>
-            ))}
-            {filteredData.length === 0 && (
-              <tr>
-                <td colSpan={3} className="p-4 text-center text-gray-400">
-                  검색 결과가 없습니다.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filteredData.map((item: any) => (
+                <tr key={item.id} className="border-b border-gray-700">
+                  <td className="p-2">
+                    <Link href={`/review/${item.id}`}>
+                      <p className="text-white hover:underline">
+                        {item.question}
+                      </p>
+                    </Link>
+                  </td>
+                  <td className="p-2">
+                    {item.scheduleDate
+                      ? item.scheduleDate.split("T")[0]
+                      : "없음"}
+                  </td>
+                  <td className="p-4">
+                    <button onClick={() => openModal(item.id)}>
+                      <FiTrash2
+                        size={16}
+                        className="cursor-pointer text-white hover:text-red-500"
+                      />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+              {filteredData.length === 0 && (
+                <tr>
+                  <td colSpan={3} className="p-4 text-center text-gray-400">
+                    검색 결과가 없습니다.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* 삭제 확인 모달 */}
