@@ -9,10 +9,16 @@ import api from "../utils/api";
 import useTodayReviews from "@/stores/useTodayReviews";
 import useAuthGuard from "@/hooks/useAuthGuard";
 
+interface Qna {
+  id: string;
+  question: string;
+  scheduleDate: string;
+}
+
 export default function ReviewPage() {
   useAuthGuard();
   const [searchTerm, setSearchTerm] = useState("");
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<Qna[]>([]);
   const [page, setPage] = useState(0); // ✅ 페이지 번호 상태 추가
   const [loading, setLoading] = useState(false); // ✅ 로딩 상태 추가
   const [hasMore, setHasMore] = useState(true); // ✅ 더 불러올 데이터 여부
@@ -32,10 +38,10 @@ export default function ReviewPage() {
 
       // ✅ 데이터 추가 로직
       if (res.data.content.length > 0) {
-        setData((prev) => [...prev, ...res.data.content]);
+        setData((prev) => [...prev, ...res.data.content]); // ✅ 타입 오류 해결
         setPage((prev) => prev + 1);
       } else {
-        setHasMore(false); // 더 이상 가져올 데이터 없음
+        setHasMore(false);
       }
     } catch (error) {
       console.error(error);
@@ -44,7 +50,6 @@ export default function ReviewPage() {
       setLoading(false);
     }
   };
-
   // ✅ 스크롤 감지 함수
   const handleScroll = () => {
     if (
