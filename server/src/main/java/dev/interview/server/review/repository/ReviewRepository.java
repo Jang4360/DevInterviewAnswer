@@ -1,8 +1,10 @@
 package dev.interview.server.review.repository;
 
 import dev.interview.server.review.domain.ReviewQueue;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -17,4 +19,8 @@ public interface ReviewRepository extends JpaRepository<ReviewQueue, UUID> {
 
     // 누적 질문 수
     Optional<ReviewQueue> findTopByUserIdOrderByReviewedAtDesc(UUID userId);
+
+    @EntityGraph(attributePaths = {"user", "qna"})
+    List<ReviewQueue> findAllByUserId(UUID userId);
+
 }

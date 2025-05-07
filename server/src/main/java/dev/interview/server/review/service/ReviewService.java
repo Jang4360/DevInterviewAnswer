@@ -10,6 +10,7 @@ import dev.interview.server.user.repository.UserRepository;
 import dev.interview.server.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -68,12 +69,14 @@ public class ReviewService {
 
     // 사용자 전체 복습 횟수 조회
     @Transactional(readOnly = true)
+    @Cacheable(value = "reviewCount", key = "#userId")
     public long getReviewCounterByUser(UUID userId) {
         return reviewRepository.countByUserId(userId);
     }
 
     // 누적 질문 횟수 조회
     @Transactional(readOnly = true)
+    @Cacheable(value = "latestReview", key = "#userId")
     public LocalDateTime getLatestReviewDate(UUID userId) {
         return reviewRepository.findTopByUserIdOrderByReviewedAtDesc(userId)
                 .map(ReviewQueue::getReviewedAt)

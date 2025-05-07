@@ -12,6 +12,7 @@ import dev.interview.server.writing.domain.Writing;
 import dev.interview.server.writing.repository.WritingRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -97,7 +98,9 @@ public class QnaService {
 
     // 전체 질문수 조회
     @Transactional(readOnly = true)
+    @Cacheable(value = "qnaCount", key = "#userId")
     public Long countByUser(UUID userId) {
+        log.info("DB에서 질문 수 조회: userId={}", userId);
         return qnaRepository.countByUserIdAndIsDeletedFalse(userId);
     }
 }

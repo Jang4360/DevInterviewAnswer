@@ -111,7 +111,7 @@ export default function ReviewPage() {
           <thead>
             <tr className="border-b border-gray-600">
               <th className="p-2">면접 질문</th>
-              <th className="p-2">예정 리뷰일</th>
+              <th className="p-2">질문 생성일</th>
               <th className="p-0">삭제</th>
             </tr>
           </thead>
