@@ -39,6 +39,7 @@ public class Qna {
     @Column(name = "is_deleted")
     private boolean isDeleted;
 
+    @Builder.Default
     @Column(nullable = false)
     private boolean reviewed = false;
 
