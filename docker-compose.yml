@@ -12,6 +12,7 @@ services:
       - .env
     depends_on:
       - qdrant
+      - db
 
   frontend:
     build:
@@ -24,6 +25,18 @@ services:
       - ./frontend/.env
     depends_on:
       - backend
+
+  db:
+    image: postgres:15  # 최신 PostgreSQL 이미지 사용
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: interviewdb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
   qdrant:
     image: qdrant/qdrant
@@ -48,4 +61,5 @@ services:
       - backend
 
 volumes:
+  postgres_data:
   qdrant_data:
