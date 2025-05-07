@@ -3,6 +3,7 @@ package dev.interview.server.config;
 import dev.interview.server.auth.token.JwtTokenProvider;
 import dev.interview.server.user.domain.User;
 import dev.interview.server.user.repository.UserRepository;
+import dev.interview.server.user.service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,7 +19,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
 
     @Override
@@ -27,8 +28,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (token != null && !jwtTokenProvider.isExpired(token)) {
             UUID userId = jwtTokenProvider.getUserId(token);
 
-            User user = userRepository.findById(userId)
-                    .orElse(null); // Null 이면 인증 실패
+            User user = userService.getUserByIdOrThrow(userId);
 
             if (user != null) {
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(user, null, null);

@@ -13,24 +13,54 @@ export default function ReviewPage() {
   useAuthGuard();
   const [searchTerm, setSearchTerm] = useState("");
   const [data, setData] = useState([]);
+  const [page, setPage] = useState(0); // ✅ 페이지 번호 상태 추가
+  const [loading, setLoading] = useState(false); // ✅ 로딩 상태 추가
+  const [hasMore, setHasMore] = useState(true); // ✅ 더 불러올 데이터 여부
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const { removeReviewById } = useTodayReviews();
 
-  useEffect(() => {
-    const fetchQnAs = async () => {
-      const userId = localStorage.getItem("userId");
-      try {
-        const res = await api.get(`/qna/user/${userId}`);
-        console.log("서버에서 받은 데이터:", res.data);
-        setData(res.data);
-      } catch (error) {
-        console.error(error);
-        alert("QnA 목록 불러오기 실패");
-      }
-    };
+  // ✅ 데이터 페이징 요청 함수
+  const fetchQnAs = async (page = 0, size = 10) => {
+    const userId = localStorage.getItem("userId");
+    try {
+      setLoading(true);
+      const res = await api.get(`/qna/user/${userId}`, {
+        params: { page, size },
+      });
+      console.log("서버에서 받은 데이터:", res.data);
 
-    fetchQnAs();
+      // ✅ 데이터 추가 로직
+      if (res.data.content.length > 0) {
+        setData((prev) => [...prev, ...res.data.content]);
+        setPage((prev) => prev + 1);
+      } else {
+        setHasMore(false); // 더 이상 가져올 데이터 없음
+      }
+    } catch (error) {
+      console.error(error);
+      alert("QnA 목록 불러오기 실패");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ✅ 스크롤 감지 함수
+  const handleScroll = () => {
+    if (
+      window.innerHeight + document.documentElement.scrollTop >=
+        document.documentElement.offsetHeight - 50 &&
+      !loading &&
+      hasMore
+    ) {
+      fetchQnAs(page); // ✅ 다음 페이지 가져오기
+    }
+  };
+
+  useEffect(() => {
+    fetchQnAs(); // ✅ 첫 페이지 로드
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const filteredData = data.filter((item: any) =>

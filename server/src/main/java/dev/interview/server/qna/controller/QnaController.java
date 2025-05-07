@@ -9,6 +9,9 @@ import dev.interview.server.qna.service.QnaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,11 +54,12 @@ public class QnaController {
     // 사용자별 전체 질문 조회하는 API
     @GetMapping("/user/{userId}")
     @Operation(summary = "사용자별 질문 전체 조회", description = "특정 사용자가 생성한 모든 질문을 조회합니다.")
-    public ResponseEntity<List<QnaSimpleResponse>> getQnaListByUser(@PathVariable UUID userId) {
-        List<Qna> qnas = qnaService.getAllByUserId(userId);
-        List<QnaSimpleResponse> response = qnas.stream()
-                .map(QnaSimpleResponse::from)
-                .toList();
+    public ResponseEntity<Page<QnaSimpleResponse>> getQnaListByUser(
+            @PathVariable UUID userId,
+            @PageableDefault(size = 10) Pageable pageable //  Pageable 파라미터 추가
+    ) {
+        Page<Qna> qnas = qnaService.getAllByUserId(userId, pageable); //  Pageable 사용
+        Page<QnaSimpleResponse> response = qnas.map(QnaSimpleResponse::from);
         return ResponseEntity.ok(response);
     }
 
