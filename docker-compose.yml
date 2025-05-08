@@ -13,6 +13,7 @@ services:
     depends_on:
       - qdrant
       - db
+      - redis
 
   frontend:
     build:
@@ -27,7 +28,7 @@ services:
       - backend
 
   db:
-    image: postgres:15  # 최신 PostgreSQL 이미지 사용
+    image: postgres:15 # 최신 PostgreSQL 이미지 사용
     container_name: postgres
     ports:
       - "5432:5432"
@@ -59,6 +60,11 @@ services:
     depends_on:
       - frontend
       - backend
+  reids:
+    image: redis:7.2-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
 
 volumes:
   postgres_data:
