@@ -17,24 +17,29 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
             # 1. 시스템 nginx 중지 (도커 nginx와 포트 충돌 방지)
+            sudo nginx -s stop || true
             sudo systemctl stop nginx 2>/dev/null || true
             sudo systemctl disable nginx 2>/dev/null || true
 
             # 2. 프로젝트 폴더로 이동 또는 클론
             if [ ! -d "/home/ubuntu/interview-platform" ]; then
                 git clone https://github.com/${{ secrets.REPO_OWNER }}/${{ secrets.REPO_NAME }} /home/ubuntu/interview-platform
+            else
+                cd /home/ubuntu/interview-platform
+                if [ ! -d ".git" ]; then
+                    git init
+                    git remote add origin https://github.com/${{ secrets.REPO_OWNER }}/${{ secrets.REPO_NAME }}
+                fi
+                git reset --hard HEAD
+                git pull origin main
             fi
-            cd /home/ubuntu/interview-platform
 
-            # 3. Git 리셋 후 최신 코드 가져오기
-            git reset --hard HEAD
-            git pull origin main
-
-            # 4. .env 파일 반영 (정확한 경로 지정)
+            # 3. .env 파일 반영 (정확한 경로 지정)
             echo "${{ secrets.ENV_FILE_ROOT }}" > /home/ubuntu/interview-platform/.env
             echo "${{ secrets.ENV_FILE_FRONT }}" > /home/ubuntu/interview-platform/frontend/.env
 
-            # 5. Docker 클린 배포
+            # 4. Docker 클린 배포
+            cd /home/ubuntu/interview-platform
             docker-compose down || true
             docker network rm interview-platform_default 2>/dev/null || true
             docker network prune -f
@@ -43,5 +48,5 @@ jobs:
             docker-compose build --no-cache
             docker-compose up -d
 
-            # 6. 이미지 정리
+            # 5. 이미지 정리
             docker image prune -f
