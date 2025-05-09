@@ -22,7 +22,11 @@ jobs:
 
             # 2. 프로젝트 폴더로 이동 또는 클론
             if [ ! -d "~/interview-platform" ]; then
-              git clone https://github.com/${{ secrets.REPO_OWNER }}/${{ secrets.REPO_NAME }} ~/interview-platform
+                git clone https://github.com/${{ secrets.REPO_OWNER }}/${{ secrets.REPO_NAME }} ~/interview-platform
+            else
+                cd ~/interview-platform
+                git reset --hard HEAD
+                git pull origin main
             fi
             cd ~/interview-platform
 
