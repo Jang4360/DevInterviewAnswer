@@ -21,23 +21,22 @@ jobs:
             sudo systemctl disable nginx || true
 
             # 2. 프로젝트 폴더로 이동 또는 클론
-            if [ ! -d "~/interview-platform" ]; then
-                git clone https://github.com/${{ secrets.REPO_OWNER }}/${{ secrets.REPO_NAME }} ~/interview-platform
-            else
-                cd ~/interview-platform
-                git reset --hard HEAD
-                git pull origin main
+            if [ ! -d "/home/ubuntu/interview-platform" ]; then
+                git clone https://github.com/${{ secrets.REPO_OWNER }}/${{ secrets.REPO_NAME }} /home/ubuntu/interview-platform
             fi
+            cd /home/ubuntu/interview-platform
 
-            # 3. 최신 코드 가져오기
+            # 3. Git 리셋 후 최신 코드 가져오기
+            git reset --hard HEAD
             git pull origin main
 
-            # 4. .env 파일 반영
-            echo "${{ secrets.ENV_FILE_ROOT }}" > .env
-            echo "${{ secrets.ENV_FILE_FRONT }}" > ./frontend/.env
+            # 4. .env 파일 반영 (정확한 경로 지정)
+            echo "${{ secrets.ENV_FILE_ROOT }}" > /home/ubuntu/interview-platform/.env
+            echo "${{ secrets.ENV_FILE_FRONT }}" > /home/ubuntu/interview-platform/frontend/.env
 
             # 5. Docker 클린 배포
-            docker-compose down
+            docker-compose down || true
+            docker network prune -f
             docker-compose pull
             docker system prune -a --volumes -f
             docker-compose build --no-cache
