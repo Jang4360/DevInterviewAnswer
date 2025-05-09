@@ -17,8 +17,8 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
             # 1. 시스템 nginx 중지 (도커 nginx와 포트 충돌 방지)
-            sudo systemctl stop nginx || true
-            sudo systemctl disable nginx || true
+            sudo systemctl stop nginx 2>/dev/null || true
+            sudo systemctl disable nginx 2>/dev/null || true
 
             # 2. 프로젝트 폴더로 이동 또는 클론
             if [ ! -d "/home/ubuntu/interview-platform" ]; then
@@ -36,6 +36,7 @@ jobs:
 
             # 5. Docker 클린 배포
             docker-compose down || true
+            docker network rm interview-platform_default 2>/dev/null || true
             docker network prune -f
             docker-compose pull
             docker system prune -a --volumes -f
