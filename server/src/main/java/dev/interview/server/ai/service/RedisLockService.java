@@ -15,6 +15,7 @@ public class RedisLockService {
         Boolean success = redisTemplate.opsForValue().setIfAbsent(key, "locked", timeout);
         return Boolean.TRUE.equals(success);
     }
+
     public void unlock(String key) {
         redisTemplate.delete(key);
     }
