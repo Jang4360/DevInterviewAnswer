@@ -25,7 +25,7 @@ public class QuestionGenerationServiceImpl implements QuestionGenerationService 
     @Override
     public GeneratedQnaResponse generateQuestions(GenerateQuestionRequest request) {
         String lockKey = "lock:generate:" + request.userId();
-        boolean locked = redisLockService.tryLock(lockKey, Duration.ofSeconds(5));
+        boolean locked = redisLockService.tryLock(lockKey, Duration.ofSeconds(1));
         if (!locked) {
             throw new IllegalStateException("질문 생성 요청이 중복되었습니다.");
         }
