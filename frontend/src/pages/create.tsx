@@ -30,14 +30,33 @@ export default function CreatePage() {
       localStorage.setItem("writingId", writingId);
       localStorage.setItem("writingContent", content);
 
-      // Spinner 페이지로 이동해서 GPT 생성 대기
-      router.push("/spinner");
+      // 인터뷰 질문 생성 API 호출
+      try {
+        await api.post("/api/ai/generate-questions", {
+          userId,
+          content,
+        });
+
+        // Spinner 페이지로 이동해서 GPT 생성 대기
+        router.push("/spinner");
+      } catch (err: any) {
+        // 중복 요청 시 에러 처리
+        if (err.response?.status === 429) {
+          alert(
+            err.response.data.message ||
+              "중복 요청입니다. 잠시 후 다시 시도해 주세요"
+          );
+        } else {
+          alert("인터뷰 질문 생성에 실패했습니다.");
+        }
+        console.error("질문 생성 에러:", err);
+      }
     } catch (error) {
-      console.error(error);
+      console.error("글 저장 실패:", error);
       alert("글 저장 실패");
     }
   };
-    //
+
   return (
     <div className="p-6 text-white">
       <h2 className="text-xl font-bold mb-4">글 작성</h2>
