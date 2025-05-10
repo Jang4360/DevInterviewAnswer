@@ -106,7 +106,7 @@ export default function ReviewPage() {
       </div>
 
       {/* QnA 리스트 */}
-      <div className="bg-[#303030] rounded-lg p-4 max-h-[400px] overflow-y-auto">
+      <div className="bg-[#303030] rounded-lg p-4 max-h-[600px] overflow-y-auto">
         <table className="w-full text-left text-white">
           <thead>
             <tr className="border-b border-gray-600">
