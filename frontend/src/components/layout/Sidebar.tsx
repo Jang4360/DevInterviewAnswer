@@ -23,7 +23,7 @@ export default function Sidebar({ isSidebarOpen }: SidebarProps) {
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
     >
-      <div className="flex items-center justify-between px-4 py-2">
+      <div className="flex items-center justify-between px-10 py-0">
         <h2 className="text-white text-lg font-bold">Today Review</h2>
       </div>
       {/* 질문 목록: 사이드바 높이 가득 채우기 */}
