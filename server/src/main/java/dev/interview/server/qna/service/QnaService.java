@@ -65,13 +65,12 @@ public class QnaService {
     // 사용자별 복습 대상 질문 조회
     @Transactional(readOnly = true)
     public List<QnaTodayResponse> getReviewQnasForToday(UUID userId) {
-        LocalDate today = LocalDate.now();
-        LocalDateTime start = today.atStartOfDay();
-        LocalDateTime end = today.atTime(23, 59, 59);
+        LocalDateTime now = LocalDateTime.now();
         List<Qna> qnaList = qnaRepository
-                .findByUserIdAndScheduledDateBetweenAndReviewedFalseAndIsDeletedFalse(userId, start, end);
+                .findByUserIdAndScheduledDateLessThanEqualAndReviewedFalseAndIsDeletedFalse(userId, now);
         return qnaList.stream().map(QnaTodayResponse::from).toList();
     }
+
 
     // 사용자별 질문 삭제
     @Transactional

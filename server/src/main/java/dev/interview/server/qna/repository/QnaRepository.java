@@ -18,10 +18,9 @@ public interface QnaRepository extends JpaRepository<Qna,UUID> {
     Page<Qna> findAllByUserIdAndIsDeletedFalse(UUID userId, Pageable pageable);
 
     // 특정 날짜 기준 복습 대상 질문 조회
-    List<Qna> findByUserIdAndScheduledDateBetweenAndReviewedFalseAndIsDeletedFalse(
+    List<Qna> findByUserIdAndScheduledDateLessThanEqualAndReviewedFalseAndIsDeletedFalse(
             UUID userId,
-            LocalDateTime start,
-            LocalDateTime end
+            LocalDateTime now
     );
 
     // 사용자별 전체 질문 수 조회
