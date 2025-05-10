@@ -32,7 +32,7 @@ export default function CreatePage() {
 
       // 인터뷰 질문 생성 API 호출
       try {
-        await api.post("/api/ai/generate-questions", {
+        await api.post("/ai/generate-questions", {
           userId,
           content,
         });
