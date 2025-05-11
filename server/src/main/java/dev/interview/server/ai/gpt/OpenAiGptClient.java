@@ -29,8 +29,74 @@ public class OpenAiGptClient implements GptClient{
     // 요약 및 유사글을 기반으로 GPT 에게 질문 / 답변 요청
     @Override
     public GeneratedQnaResponse generateQuestions(String summary, List<String> similarSummaries) {
+        return generateQuestionsAsync(summary, similarSummaries).block(); // 비동기 호출을 동기로 래핑
+    }
+
+    // ✅ 비동기 메서드 추가
+    @Override
+    public Mono<GeneratedQnaResponse> generateQuestionsAsync(String summary, List<String> similarSummaries) {
         String url = "https://api.openai.com/v1/chat/completions";
 
+        // 프롬프트 생성 (기존 코드 유지)
+        String prompt = createPrompt(summary, similarSummaries);
+
+        Map<String, Object> requestBody = new HashMap<>();
+        requestBody.put("model", "gpt-3.5-turbo-1106");
+        requestBody.put("messages", new Object[]{
+                Map.of("role", "user", "content", prompt)
+        });
+        requestBody.put("max_tokens", 1000);
+        requestBody.put("temperature", 0.7);
+
+        // WebClient로 비동기 요청
+        return webClient.post()
+                .uri(url)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + openAiApiKey)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(requestBody)
+                .retrieve()
+                .bodyToMono(Map.class)
+                .flatMap(response -> {
+                    List<Map<String, Object>> choices = (List<Map<String, Object>>) response.get("choices");
+                    Map<String, Object> message = (Map<String, Object>) choices.get(0).get("message");
+                    String content = (String) message.get("content");
+                    return Mono.fromCallable(() -> parseQnaItems(content))
+                            .map(qnaItems -> new GeneratedQnaResponse(qnaItems));
+                });
+    }
+    // QnA 아이템 파싱 메서드
+    private List<GeneratedQnaResponse.QnaItem> parseQnaItems(String content) {
+        List<GeneratedQnaResponse.QnaItem> qnaItems = new ArrayList<>();
+        String[] lines = content.split("\n");
+        String currentQuestion = null;
+        String currentAnswer = null;
+
+        for (String line : lines) {
+            line = line.trim();
+            if (line.startsWith("1.") || line.startsWith("2.") || line.startsWith("3.")) {
+                if (currentQuestion != null && currentAnswer != null) {
+                    qnaItems.add(new GeneratedQnaResponse.QnaItem(currentQuestion, currentAnswer));
+                }
+                currentQuestion = line.replaceFirst("^[1-3]\\. 질문[:：]?", "").trim();
+                currentAnswer = null;
+            } else if (line.startsWith("답변") || line.startsWith("답:")) {
+                currentAnswer = line.replaceFirst("^답변[:：]?", "").trim();
+            } else {
+                if (currentAnswer != null) {
+                    currentAnswer += " " + line;
+                }
+            }
+        }
+
+        if (currentQuestion != null && currentAnswer != null) {
+            qnaItems.add(new GeneratedQnaResponse.QnaItem(currentQuestion, currentAnswer));
+        }
+
+        return qnaItems;
+    }
+
+    // 기존 프롬프트 생성 메서드 유지
+    private String createPrompt(String summary, List<String> similarSummaries) {
         StringBuilder promptBuilder = new StringBuilder();
         promptBuilder.append("다음 글 요약을 바탕으로 면접 질문 3개와 각 질문에 대한 모범 답변을 만들어줘. 질문 작성 시 다음 사항을 반영해야 해:\n" +
                 "1. 단순 개념 확인이 아닌, 실무 상황과 연계된 질문 - 예를 들어 \"X가 무엇인가요?\" 대신 \"프로젝트에서 X를 사용할 때 발생할 수 있는 문제점과 해결 방안은?\"\n" +
@@ -61,66 +127,6 @@ public class OpenAiGptClient implements GptClient{
         promptBuilder.append("2. 질문: ...\n   답변: ...\n");
         promptBuilder.append("3. 질문: ...\n   답변: ...\n");
 
-        String prompt = promptBuilder.toString();
-
-        Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("model", "gpt-3.5-turbo-1106");
-        requestBody.put("messages", new Object[]{
-                Map.of("role", "user", "content", prompt)
-        });
-        requestBody.put("max_tokens", 1000);
-        requestBody.put("temperature", 0.7);
-
-        Map<String, Object> response = webClient.post()
-                .uri(url)
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + openAiApiKey)
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(requestBody)
-                .retrieve()
-                .onStatus(HttpStatus.TOO_MANY_REQUESTS::equals, clientResponse -> {
-                    return Mono.error(new RuntimeException("429 Too Many Requests"));
-                })
-                .bodyToMono(Map.class)
-                .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(1))
-                        .filter(throwable -> throwable instanceof RuntimeException &&
-                                throwable.getMessage().contains("429")))
-                .block();
-
-        Map choice = (Map) ((List) response.get("choices")).get(0);
-        Map message = (Map) choice.get("message");
-        String content = (String) message.get("content");
-
-        return new GeneratedQnaResponse(parseQnaItems(content));
-    }
-
-    // GPT 응답을 질문/답변 형태로 파싱 -> 질문/답변 리스트 추출
-    private List<GeneratedQnaResponse.QnaItem> parseQnaItems(String content) {
-        List<GeneratedQnaResponse.QnaItem> qnaItems = new ArrayList<>();
-        String[] lines = content.split("\n");
-        String currentQuestion = null;
-        String currentAnswer = null;
-
-        for (String line : lines) {
-            line = line.trim();
-            if (line.startsWith("1.") || line.startsWith("2.") || line.startsWith("3.")) {
-                if (currentQuestion != null && currentAnswer != null) {
-                    qnaItems.add(new GeneratedQnaResponse.QnaItem(currentQuestion, currentAnswer));
-                }
-                currentQuestion = line.replaceFirst("^[1-3]\\. 질문[:：]?", "").trim();
-                currentAnswer = null;
-            } else if (line.startsWith("답변") || line.startsWith("답:")) {
-                currentAnswer = line.replaceFirst("^답변[:：]?", "").trim();
-            } else {
-                if (currentAnswer != null) {
-                    currentAnswer += " " + line;
-                }
-            }
-        }
-
-        if (currentQuestion != null && currentAnswer != null) {
-            qnaItems.add(new GeneratedQnaResponse.QnaItem(currentQuestion, currentAnswer));
-        }
-
-        return qnaItems;
+        return promptBuilder.toString();
     }
 }

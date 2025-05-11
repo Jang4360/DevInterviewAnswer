@@ -23,33 +23,28 @@ public class EmbeddingServiceImpl implements EmbeddingService{
 
     @Value("${openai.api.key}")
     private String openAiApiKey;
-
-    // 글 요약 -> 임베딩 벡터 생성 (OpenAI API 사용)
     @Override
     public List<Float> createEmbedding(String text) {
+        return createEmbeddingAsync(text).block(); // 비동기 메서드 동기 호출로 래핑
+    }
+    // 글 요약 -> 임베딩 벡터 생성 (OpenAI API 사용)
+    @Override
+    public Mono<List<Float>> createEmbeddingAsync(String text) {
         String url = "https://api.openai.com/v1/embeddings";
 
         Map<String, Object> requestBody = new HashMap<>();
         requestBody.put("model", "text-embedding-3-small");
         requestBody.put("input", text);
 
-        Map response = webClient.post()
+        return webClient.post()
                 .uri(url)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + openAiApiKey)
-                .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(requestBody)
                 .retrieve()
-                .onStatus(HttpStatus.TOO_MANY_REQUESTS::equals, clientResponse -> {
-                    return Mono.error(new RuntimeException("429 Too Many Requests"));
-                })
                 .bodyToMono(Map.class)
-                .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(1))
-                        .filter(throwable -> throwable instanceof RuntimeException &&
-                                throwable.getMessage().contains("429")))
-                .block();
-
-        Map embeddingData = (Map) ((List) response.get("data")).get(0);
-        System.out.println("생성된 Embedding: " + embeddingData);
-        return (List<Float>) embeddingData.get("embedding");
+                .map(response -> {
+                    Map embeddingData = (Map) ((List) response.get("data")).get(0);
+                    return (List<Float>) embeddingData.get("embedding");
+                });
     }
 }

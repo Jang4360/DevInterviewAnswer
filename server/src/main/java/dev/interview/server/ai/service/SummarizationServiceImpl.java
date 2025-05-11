@@ -24,9 +24,14 @@ public class SummarizationServiceImpl implements SummarizationService{
     @Value("${openai.api.key}")
     private String openAiApiKey;
 
-    // 글 내용을 3문장으로 요약
     @Override
     public String summarize(String content) {
+        return summarizeAsync(content).block(); // 비동기 메서드 동기 호출로 래핑
+    }
+
+    // 글 내용을 3문장으로 요약
+    @Override
+    public Mono<String> summarizeAsync(String content) {
         String url = "https://api.openai.com/v1/chat/completions";
 
         String prompt = "다음 글을 2~3 문장으로 요약해줘:\n" + content;
@@ -38,27 +43,18 @@ public class SummarizationServiceImpl implements SummarizationService{
         });
         requestBody.put("max_tokens", 100);
 
-        Map response = webClient.post()
+        return webClient.post()
                 .uri(url)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + openAiApiKey)
-                .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(requestBody)
                 .retrieve()
-                .onStatus(HttpStatus.TOO_MANY_REQUESTS::equals, clientResponse -> {
-                    return Mono.error(new RuntimeException("429 Too Many Requests"));
-                })
                 .bodyToMono(Map.class)
-                .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(1))
-                        .filter(throwable -> throwable instanceof RuntimeException &&
-                                throwable.getMessage().contains("429")))
-                .block();
-
-        Map responseBody = response;
-        List choices = (List) responseBody.get("choices");
-        Map choice = (Map) choices.get(0);
-        Map message = (Map) choice.get("message");
-        String summary = (String) message.get("content");
-
-        return summary;
+                .map(response -> {
+                    Map responseBody = response;
+                    List choices = (List) responseBody.get("choices");
+                    Map choice = (Map) choices.get(0);
+                    Map message = (Map) choice.get("message");
+                    return (String) message.get("content");
+                });
     }
 }

@@ -8,7 +8,10 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
+
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Profile("!test")
 @Component
@@ -25,36 +28,13 @@ public class QdrantVectorDBClient implements VectorDBClient {
 
 
     // Qdrant 컬렉션 초기화 (없으면 생성)
-    @PostConstruct
-    public void initCollection() {
-        String url = qdrantApiUrl + "/collections/" + COLLECTION_NAME;
-
-        Map<String, Object> vectors = Map.of(
-                "size", 1536,
-                "distance", "Cosine"
-        );
-
-        Map<String, Object> requestBody = Map.of(
-                "vectors", vectors
-        );
-
-        try {
-            webClient.put()
-                    .uri(url)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(requestBody)
-                    .retrieve()
-                    .bodyToMono(Void.class)
-                    .block();
-
-            log.info("✅ Qdrant 컬렉션 생성 완료");
-        } catch (Exception e) {
-            log.warn("⚠️ Qdrant 컬렉션 생성 실패 또는 이미 존재: {}", e.getMessage());
-        }
+    @Override
+    public void saveEmbedding(UUID userId, String summary, List<Float> embedding) {
+        saveEmbeddingAsync(userId, summary, embedding).block(); // 비동기 호출을 동기로 래핑
     }
 
     @Override
-    public void saveEmbedding(UUID userId, String summary, List<Float> embedding) {
+    public Mono<Void> saveEmbeddingAsync(UUID userId, String summary, List<Float> embedding) {
         String url = qdrantApiUrl + "/collections/" + COLLECTION_NAME + "/points";
 
         Map<String, Object> point = Map.of(
@@ -70,19 +50,23 @@ public class QdrantVectorDBClient implements VectorDBClient {
                 "points", List.of(point)
         );
 
-        Map response = webClient.put()
+        return webClient.put()
                 .uri(url)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(requestBody)
                 .retrieve()
-                .bodyToMono(Map.class)
-                .block();
-
-        log.info("✅ Qdrant 저장 응답: {}", response);
+                .bodyToMono(Void.class)
+                .doOnSuccess(v -> log.info("✅ Qdrant 저장 완료"))
+                .doOnError(e -> log.error("❌ Qdrant 저장 실패: {}", e.getMessage()));
     }
 
     @Override
     public List<String> searchSimilarSummaries(UUID userId, List<Float> embedding) {
+        return searchSimilarSummariesAsync(userId, embedding).block(); // 비동기 호출을 동기로 래핑
+    }
+
+    @Override
+    public Mono<List<String>> searchSimilarSummariesAsync(UUID userId, List<Float> embedding) {
         String url = qdrantApiUrl + "/collections/" + COLLECTION_NAME + "/points/search";
 
         Map<String, Object> requestBody = Map.of(
@@ -95,26 +79,20 @@ public class QdrantVectorDBClient implements VectorDBClient {
                 )
         );
 
-        Map response = webClient.post()
+        return webClient.post()
                 .uri(url)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(requestBody)
                 .retrieve()
                 .bodyToMono(Map.class)
-                .block();
-
-        List<Map<String, Object>> result = (List<Map<String, Object>>) response.get("result");
-
-        List<String> summaries = new ArrayList<>();
-        for (Map<String, Object> item : result) {
-            Map<String, Object> payload = (Map<String, Object>) item.get("payload");
-            if (payload != null && payload.get("summary") != null) {
-                summaries.add((String) payload.get("summary"));
-            } else {
-                log.warn("⚠️ payload 누락: {}", item);
-            }
-        }
-
-        return summaries;
+                .flatMap(response -> {
+                    List<Map<String, Object>> result = (List<Map<String, Object>>) response.get("result");
+                    List<String> summaries = result.stream()
+                            .map(item -> (Map<String, Object>) item.get("payload"))
+                            .filter(Objects::nonNull)
+                            .map(payload -> (String) payload.get("summary"))
+                            .collect(Collectors.toList());
+                    return Mono.just(summaries);
+                });
     }
 }

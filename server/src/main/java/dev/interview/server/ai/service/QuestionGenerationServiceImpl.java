@@ -7,6 +7,7 @@ import dev.interview.server.ai.gpt.GptClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 import java.util.List;
@@ -21,34 +22,24 @@ public class QuestionGenerationServiceImpl implements QuestionGenerationService 
     private final EmbeddingService embeddingService; // 임베딩 생성
     private final RedisLockService redisLockService;
 
-    // 전체 질문 생성 프로세스
     @Override
     public GeneratedQnaResponse generateQuestions(GenerateQuestionRequest request) {
+        return generateQuestionsAsync(request).block(); // 비동기 메서드 동기 호출로 래핑
+    }
+
+    // 전체 질문 생성 프로세스
+    @Override
+    public Mono<GeneratedQnaResponse> generateQuestionsAsync(GenerateQuestionRequest request) {
         String lockKey = "lock:generate:" + request.userId();
         boolean locked = redisLockService.tryLock(lockKey, Duration.ofSeconds(1));
         if (!locked) {
-            throw new IllegalStateException("질문 생성 요청이 중복되었습니다.");
+            return Mono.error(new IllegalStateException("질문 생성 요청이 중복되었습니다."));
         }
-        try{
-            log.info("generateQuestions 호출됨 - userId: {}, content: {}", request.userId(), request.content());
-            // 1. 글 요약 생성
-            String summary = summarizationService.summarize(request.content());
 
-            // 2. 요약 → 임베딩 생성
-            List<Float> embedding = embeddingService.createEmbedding(summary);
-
-            // 3. Vector DB 저장
-            vectorDBClient.saveEmbedding(request.userId(), summary, embedding);
-
-            // 4. 유사 글 검색
-            List<String> similarSummaries = vectorDBClient.searchSimilarSummaries(request.userId(), embedding);
-
-            // 5. GPT 질문 생성
-            GeneratedQnaResponse response = gptClient.generateQuestions(summary, similarSummaries);
-
-            return response;
-        } finally {
-            redisLockService.unlock(lockKey);
-        }
+        return summarizationService.summarizeAsync(request.content())
+                .flatMap(summary -> embeddingService.createEmbeddingAsync(summary)
+                        .flatMap(embedding -> vectorDBClient.saveEmbeddingAsync(request.userId(), summary, embedding)
+                                .then(gptClient.generateQuestionsAsync(summary, List.of()))))
+                .doFinally(signalType -> redisLockService.unlock(lockKey));
     }
 }
