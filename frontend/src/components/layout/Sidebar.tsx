@@ -26,7 +26,7 @@ export default function Sidebar({ isSidebarOpen }: SidebarProps) {
       <div className="flex items-center justify-between px-10 py-0">
         <h2 className="text-white text-lg font-bold">Today Review</h2>
       </div>
-      {/* 질문 목록: 사이드바 높이 가득 채우기 */}
+      {/* 질문 목록: 사이드바 높이 가득 채우기*/}
       <div className="flex-1 mt-2 overflow-y-auto">
         <ul className="space-y-3 px-2">
           {reviews.length > 0 ? (
