@@ -14,7 +14,7 @@
     <hashTree>
       <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="User Thread Group" enabled="true">
         <stringProp name="ThreadGroup.num_threads">10</stringProp> <!-- 유저 수 -->
-        <stringProp name="ThreadGroup.ramp_time">5</stringProp> <!-- 증가 시간 -->
+        <stringProp name="ThreadGroup.ramp_time">5</stringProp> <!-- 증가 시간 .-->
         <longProp name="ThreadGroup.duration">60</longProp> <!-- 테스트 시간 -->
       </ThreadGroup>
       <hashTree>
