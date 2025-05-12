@@ -6,7 +6,7 @@
         <collectionProp name="Arguments.arguments">
           <elementProp name="baseUrl" elementType="Argument">
             <stringProp name="Argument.name">baseUrl</stringProp>
-            <stringProp name="Argument.value">http://localhost:8080</stringProp>
+            <stringProp name="Argument.value">43.201.208.238</stringProp> <!-- EC2 공인 IP -->
           </elementProp>
         </collectionProp>
       </elementProp>
@@ -14,8 +14,9 @@
     <hashTree>
       <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="User Thread Group" enabled="true">
         <stringProp name="ThreadGroup.num_threads">10</stringProp> <!-- 유저 수 -->
-        <stringProp name="ThreadGroup.ramp_time">5</stringProp> <!-- 증가 시간 .-->
+        <stringProp name="ThreadGroup.ramp_time">5</stringProp> <!-- 증가 시간 -->
         <longProp name="ThreadGroup.duration">60</longProp> <!-- 테스트 시간 -->
+        <boolProp name="ThreadGroup.scheduler">true</boolProp>
       </ThreadGroup>
       <hashTree>
         <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Generate Questions API" enabled="true">
@@ -24,7 +25,7 @@
           <stringProp name="HTTPSampler.protocol">http</stringProp>
           <stringProp name="HTTPSampler.path">/api/ai/generate-questions</stringProp>
           <stringProp name="HTTPSampler.method">POST</stringProp>
-          <stringProp name="HTTPSampler.postBodyRaw">true</stringProp>
+          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
             <collectionProp name="Arguments.arguments">
               <elementProp name="textBody" elementType="HTTPArgument">
@@ -32,6 +33,17 @@
                 <stringProp name="Argument.value">{"userId":"1234","content":"Sample content for testing"}</stringProp>
                 <stringProp name="HTTPArgument.always_encode">false</stringProp>
                 <stringProp name="HTTPArgument.use_equals">false</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.urlEncode">false</boolProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="HTTPSampler.contentEncoding">UTF-8</stringProp>
+          <elementProp name="HeaderManager.headers" elementType="HeaderManager">
+            <collectionProp name="HeaderManager.headers">
+              <elementProp name="" elementType="Header">
+                <stringProp name="Header.name">Content-Type</stringProp>
+                <stringProp name="Header.value">application/json</stringProp>
               </elementProp>
             </collectionProp>
           </elementProp>
