@@ -20,7 +20,7 @@
       </ThreadGroup>
       <hashTree>
         <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Generate Questions API" enabled="true">
-          <stringProp name="HTTPSampler.domain">${baseUrl}</stringProp>
+          <stringProp name="HTTPSampler.domain">43.201.208.238</stringProp> <!-- 직접 IP 설정 -->
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol">http</stringProp>
           <stringProp name="HTTPSampler.path">/api/ai/generate-questions</stringProp>
@@ -32,7 +32,7 @@
                 <stringProp name="Argument.name"></stringProp>
                 <stringProp name="Argument.value">{"userId":"1234","content":"Sample content for testing"}</stringProp>
                 <stringProp name="HTTPArgument.always_encode">false</stringProp>
-                <stringProp name="HTTPArgument.use_equals">false</stringProp>
+                <stringProp name="HTTPArgument.use_equals">true</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
                 <boolProp name="HTTPArgument.urlEncode">false</boolProp>
               </elementProp>
