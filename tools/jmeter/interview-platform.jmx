@@ -8,6 +8,10 @@
             <stringProp name="Argument.name">baseUrl</stringProp>
             <stringProp name="Argument.value">43.201.208.238</stringProp> <!-- EC2 공인 IP -->
           </elementProp>
+          <elementProp name="accessToken" elementType="Argument">
+            <stringProp name="Argument.name">accessToken</stringProp>
+            <stringProp name="Argument.value">eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1ZTM0YWViOS05YTE0LTQ0OTItODQzMi0wNTVjNjRhYzM0YzgiLCJpYXQiOjE3NDcwNTYxOTksImV4cCI6MTc0NzA1Nzk5OX0.ard5IaZf_GNaaJlrEGOWDMQnrdSlyIx6vSojfiW4YbU</stringProp> <!-- 토큰 직접 입력 -->
+          </elementProp>
         </collectionProp>
       </elementProp>
     </TestPlan>
@@ -20,7 +24,7 @@
       </ThreadGroup>
       <hashTree>
         <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Generate Questions API" enabled="true">
-          <stringProp name="HTTPSampler.domain">43.201.208.238</stringProp> <!-- 직접 IP 설정 -->
+          <stringProp name="HTTPSampler.domain">${baseUrl}</stringProp>
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol">http</stringProp>
           <stringProp name="HTTPSampler.path">/api/ai/generate-questions</stringProp>
@@ -39,11 +43,16 @@
             </collectionProp>
           </elementProp>
           <stringProp name="HTTPSampler.contentEncoding">UTF-8</stringProp>
+          <!-- ✅ Authorization 헤더 추가 -->
           <elementProp name="HeaderManager.headers" elementType="HeaderManager">
             <collectionProp name="HeaderManager.headers">
               <elementProp name="" elementType="Header">
                 <stringProp name="Header.name">Content-Type</stringProp>
                 <stringProp name="Header.value">application/json</stringProp>
+              </elementProp>
+              <elementProp name="" elementType="Header">
+                <stringProp name="Header.name">Authorization</stringProp>
+                <stringProp name="Header.value">Bearer ${accessToken}</stringProp>
               </elementProp>
             </collectionProp>
           </elementProp>
