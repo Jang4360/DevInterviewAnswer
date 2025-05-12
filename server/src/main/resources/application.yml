@@ -27,6 +27,12 @@ spring:
       host: redis
       port: 6379
 
+logging:
+  level:
+    dev.interview.server.aop: INFO
+  file:
+    name: logs/performance.log
+
 jwt:
   secret: ${JWT_SECRET}
 
