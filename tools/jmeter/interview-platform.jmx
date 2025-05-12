@@ -30,7 +30,7 @@
             <collectionProp name="Arguments.arguments">
               <elementProp name="textBody" elementType="HTTPArgument">
                 <stringProp name="Argument.name"></stringProp>
-                <stringProp name="Argument.value">{"userId":"1234","content":"Sample content for testing"}</stringProp>
+                <stringProp name="Argument.value">{"userId":"5e34aeb9-9a14-4492-8432-055c64ac34c8","content":"Sample content for testing"}</stringProp>
                 <stringProp name="HTTPArgument.always_encode">false</stringProp>
                 <stringProp name="HTTPArgument.use_equals">true</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
