@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class PerformanceLoggingAspect {
-    @Around("execution(* dev.interview.service.*.*(..))")
+    @Around("execution(* dev.interview.server.ai.service.*.*(..))")
     public Object logExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
         long start = System.currentTimeMillis();
         Object result = joinPoint.proceed();
