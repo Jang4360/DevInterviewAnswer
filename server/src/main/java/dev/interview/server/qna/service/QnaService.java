@@ -111,10 +111,4 @@ public class QnaService {
         log.info("DB에서 질문 수 조회: userId={}", userId);
         return qnaRepository.countByUserIdAndIsDeletedFalse(userId);
     }
-
-    // 복습 횟수 증가
-    @Transactional
-    public void incrementReviewCount(UUID qnaId) {
-
-    }
 }

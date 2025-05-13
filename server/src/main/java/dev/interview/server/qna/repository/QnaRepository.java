@@ -29,8 +29,4 @@ public interface QnaRepository extends JpaRepository<Qna,UUID> {
     // 사용자별 전체 질문 수 조회
     Long countByUserIdAndIsDeletedFalse(UUID userId);
 
-    // 복습 횟수 업데이트
-    @Modifying
-    @Query("UPDATE Qna q SET q.reviewCount = q.reviewCount + 1, q.lastReviewedAt = :lastReviewedAt WHERE q.id = :qnaId")
-    void incrementReviewCount(@Param("qnaId") UUID qnaId, @Param("lastReviewedAt") LocalDateTime lastReviewedAt);
 }
