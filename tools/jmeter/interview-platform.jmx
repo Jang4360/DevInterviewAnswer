@@ -8,10 +8,6 @@
             <stringProp name="Argument.name">baseUrl</stringProp>
             <stringProp name="Argument.value">43.201.208.238</stringProp> <!-- EC2 공인 IP -->
           </elementProp>
-          <elementProp name="accessToken" elementType="Argument">
-            <stringProp name="Argument.name">accessToken</stringProp>
-            <stringProp name="Argument.value">eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1ZTM0YWViOS05YTE0LTQ0OTItODQzMi0wNTVjNjRhYzM0YzgiLCJpYXQiOjE3NDcwNTYxOTksImV4cCI6MTc0NzA1Nzk5OX0.ard5IaZf_GNaaJlrEGOWDMQnrdSlyIx6vSojfiW4YbU</stringProp> <!-- 토큰 직접 입력 -->
-          </elementProp>
         </collectionProp>
       </elementProp>
     </TestPlan>
@@ -27,14 +23,14 @@
           <stringProp name="HTTPSampler.domain">${baseUrl}</stringProp>
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol">http</stringProp>
-          <stringProp name="HTTPSampler.path">/api/ai/generate-questions</stringProp>
+          <stringProp name="HTTPSampler.path">/api/test/generate-questions</stringProp> <!-- 테스트 API 경로 수정 -->
           <stringProp name="HTTPSampler.method">POST</stringProp>
           <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
             <collectionProp name="Arguments.arguments">
               <elementProp name="textBody" elementType="HTTPArgument">
                 <stringProp name="Argument.name"></stringProp>
-                <stringProp name="Argument.value">{"userId":"5e34aeb9-9a14-4492-8432-055c64ac34c8","content":"Sample content for testing"}</stringProp>
+                <stringProp name="Argument.value">{"userId":"1234","content":"Sample content for testing"}</stringProp>
                 <stringProp name="HTTPArgument.always_encode">false</stringProp>
                 <stringProp name="HTTPArgument.use_equals">true</stringProp>
                 <stringProp name="Argument.metadata">=</stringProp>
@@ -43,16 +39,11 @@
             </collectionProp>
           </elementProp>
           <stringProp name="HTTPSampler.contentEncoding">UTF-8</stringProp>
-          <!-- ✅ Authorization 헤더 추가 -->
           <elementProp name="HeaderManager.headers" elementType="HeaderManager">
             <collectionProp name="HeaderManager.headers">
               <elementProp name="" elementType="Header">
                 <stringProp name="Header.name">Content-Type</stringProp>
                 <stringProp name="Header.value">application/json</stringProp>
-              </elementProp>
-              <elementProp name="" elementType="Header">
-                <stringProp name="Header.name">Authorization</stringProp>
-                <stringProp name="Header.value">Bearer ${accessToken}</stringProp>
               </elementProp>
             </collectionProp>
           </elementProp>
