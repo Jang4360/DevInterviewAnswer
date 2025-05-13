@@ -58,8 +58,7 @@ public class QnaController {
             @PathVariable UUID userId,
             @PageableDefault(size = 10) Pageable pageable //  Pageable 파라미터 추가
     ) {
-        Page<Qna> qnas = qnaService.getAllByUserId(userId, pageable); //  Pageable 사용
-        Page<QnaSimpleResponse> response = qnas.map(QnaSimpleResponse::from);
+        Page<QnaSimpleResponse> response = qnaService.getQnaListWithReviewCount(userId, pageable);
         return ResponseEntity.ok(response);
     }
 

@@ -3,8 +3,10 @@ package dev.interview.server.qna.service;
 import dev.interview.server.global.exception.ForbiddenException;
 import dev.interview.server.global.exception.NotFoundException;
 import dev.interview.server.qna.domain.Qna;
+import dev.interview.server.qna.dto.QnaSimpleResponse;
 import dev.interview.server.qna.dto.QnaTodayResponse;
 import dev.interview.server.qna.repository.QnaRepository;
+import dev.interview.server.review.service.ReviewService;
 import dev.interview.server.user.domain.User;
 import dev.interview.server.user.repository.UserRepository;
 import dev.interview.server.user.service.UserService;
@@ -31,6 +33,7 @@ public class QnaService {
     private final QnaRepository qnaRepository;
     private final UserService userService;
     private final WritingRepository writingRepository;
+    private final ReviewService reviewService;
 
     // 질문 생성 저장
     @Transactional
@@ -58,8 +61,14 @@ public class QnaService {
 
     // 사용자별 질문 전체 조회
     @Transactional(readOnly = true)
-    public Page<Qna> getAllByUserId(UUID userId, Pageable pageable) {
-        return qnaRepository.findAllByUserIdAndIsDeletedFalse(userId, pageable);
+    public Page<QnaSimpleResponse> getQnaListWithReviewCount(UUID userId, Pageable pageable) {
+        Page<Qna> qnas = qnaRepository.findAllByUserIdAndIsDeletedFalse(userId, pageable);
+
+        // 각 QnA의 복습 횟수를 함께 조회
+        return qnas.map(qna -> {
+            Long reviewCount = reviewService.getReviewCounterByQna(qna.getId());
+            return QnaSimpleResponse.from(qna, reviewCount);
+        });
     }
 
     // 사용자별 복습 대상 질문 조회
@@ -101,5 +110,11 @@ public class QnaService {
     public Long countByUser(UUID userId) {
         log.info("DB에서 질문 수 조회: userId={}", userId);
         return qnaRepository.countByUserIdAndIsDeletedFalse(userId);
+    }
+
+    // 복습 횟수 증가
+    @Transactional
+    public void incrementReviewCount(UUID qnaId) {
+
     }
 }

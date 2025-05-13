@@ -1,17 +1,20 @@
 <jmeterTestPlan version="1.2" properties="5.0" jmeter="5.5">
   <hashTree>
+    <!-- Test Plan 설정 -->
     <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Interview Platform Test" enabled="true">
       <stringProp name="TestPlan.comments"></stringProp>
       <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
         <collectionProp name="Arguments.arguments">
+          <!-- EC2 공인 IP 설정 -->
           <elementProp name="baseUrl" elementType="Argument">
             <stringProp name="Argument.name">baseUrl</stringProp>
-            <stringProp name="Argument.value">43.201.208.238</stringProp> <!-- EC2 공인 IP -->
+            <stringProp name="Argument.value">43.201.208.238</stringProp>
           </elementProp>
         </collectionProp>
       </elementProp>
     </TestPlan>
     <hashTree>
+      <!-- Thread Group 설정 -->
       <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="User Thread Group" enabled="true">
         <stringProp name="ThreadGroup.num_threads">10</stringProp> <!-- 유저 수 -->
         <stringProp name="ThreadGroup.ramp_time">5</stringProp> <!-- 증가 시간 -->
@@ -19,15 +22,18 @@
         <boolProp name="ThreadGroup.scheduler">true</boolProp>
       </ThreadGroup>
       <hashTree>
+        <!-- HTTP Request 설정 -->
         <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Generate Questions API" enabled="true">
           <stringProp name="HTTPSampler.domain">${baseUrl}</stringProp>
           <stringProp name="HTTPSampler.port">8080</stringProp>
           <stringProp name="HTTPSampler.protocol">http</stringProp>
-          <stringProp name="HTTPSampler.path">/api/test/generate-questions</stringProp> <!-- 테스트 API 경로 수정 -->
+          <!-- 테스트용 API 경로 -->
+          <stringProp name="HTTPSampler.path">/api/test/generate-questions</stringProp>
           <stringProp name="HTTPSampler.method">POST</stringProp>
           <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
           <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
             <collectionProp name="Arguments.arguments">
+              <!-- 요청 바디 설정 -->
               <elementProp name="textBody" elementType="HTTPArgument">
                 <stringProp name="Argument.name"></stringProp>
                 <stringProp name="Argument.value">{"userId":"1234","content":"Sample content for testing"}</stringProp>
@@ -39,6 +45,7 @@
             </collectionProp>
           </elementProp>
           <stringProp name="HTTPSampler.contentEncoding">UTF-8</stringProp>
+          <!-- 헤더 설정 -->
           <elementProp name="HeaderManager.headers" elementType="HeaderManager">
             <collectionProp name="HeaderManager.headers">
               <elementProp name="" elementType="Header">

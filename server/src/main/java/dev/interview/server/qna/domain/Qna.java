@@ -34,7 +34,7 @@ public class Qna {
     private LocalDateTime lastReviewedAt;
 
     @Column(name = "scheduled_date")
-    private LocalDateTime scheduledDate; // 복습 ㄴ시작일 (3,7,15...)
+    private LocalDateTime scheduledDate; // 복습 시작일 (3,7,15...)
 
     @Column(name = "is_deleted")
     private boolean isDeleted;
@@ -42,6 +42,9 @@ public class Qna {
     @Builder.Default
     @Column(nullable = false)
     private boolean reviewed = false;
+
+    @Column(name = "review_count", nullable = false)
+    private int reviewCount;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "writing_id")

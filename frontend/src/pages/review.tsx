@@ -13,15 +13,16 @@ interface Qna {
   id: string;
   question: string;
   scheduleDate: string;
+  reviewCount: number; // ✅ 복습 횟수 필드 추가
 }
 
 export default function ReviewPage() {
   useAuthGuard();
   const [searchTerm, setSearchTerm] = useState("");
   const [data, setData] = useState<Qna[]>([]);
-  const [page, setPage] = useState(0); // ✅ 페이지 번호 상태 추가
-  const [loading, setLoading] = useState(false); // ✅ 로딩 상태 추가
-  const [hasMore, setHasMore] = useState(true); // ✅ 더 불러올 데이터 여부
+  const [page, setPage] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const { removeReviewById } = useTodayReviews();
@@ -34,11 +35,24 @@ export default function ReviewPage() {
       const res = await api.get(`/qna/user/${userId}`, {
         params: { page, size },
       });
-      console.log("서버에서 받은 데이터:", res.data);
+
+      // ✅ 복습 횟수 추가 요청
+      const updatedData = await Promise.all(
+        res.data.content.map(async (item: Qna) => {
+          try {
+            const reviewRes = await api.get(`/review/qna/${item.id}/count`);
+            item.reviewCount = reviewRes.data.count;
+          } catch (error) {
+            console.error("복습 횟수 조회 실패:", error);
+            item.reviewCount = 0;
+          }
+          return item;
+        })
+      );
 
       // ✅ 데이터 추가 로직
-      if (res.data.content.length > 0) {
-        setData((prev) => [...prev, ...res.data.content]); // ✅ 타입 오류 해결
+      if (updatedData.length > 0) {
+        setData((prev) => [...prev, ...updatedData]);
         setPage((prev) => prev + 1);
       } else {
         setHasMore(false);
@@ -50,6 +64,7 @@ export default function ReviewPage() {
       setLoading(false);
     }
   };
+
   // ✅ 스크롤 감지 함수
   const handleScroll = () => {
     if (
@@ -58,17 +73,17 @@ export default function ReviewPage() {
       !loading &&
       hasMore
     ) {
-      fetchQnAs(page); // ✅ 다음 페이지 가져오기
+      fetchQnAs(page);
     }
   };
 
   useEffect(() => {
-    fetchQnAs(); // ✅ 첫 페이지 로드
+    fetchQnAs();
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const filteredData = data.filter((item: any) =>
+  const filteredData = data.filter((item: Qna) =>
     item.question.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -81,7 +96,7 @@ export default function ReviewPage() {
     const userId = localStorage.getItem("userId");
     try {
       await api.delete(`/qna/${selectedId}?userId=${userId}`);
-      setData(data.filter((item: any) => item.id !== selectedId));
+      setData(data.filter((item: Qna) => item.id !== selectedId));
       if (selectedId) {
         removeReviewById(selectedId);
       }
@@ -112,11 +127,12 @@ export default function ReviewPage() {
             <tr className="border-b border-gray-600">
               <th className="p-2">면접 질문</th>
               <th className="p-2">질문 생성일</th>
+              <th className="p-2">복습 횟수</th> {/* ✅ 복습 횟수 헤더 추가 */}
               <th className="p-0">삭제</th>
             </tr>
           </thead>
           <tbody>
-            {filteredData.map((item: any) => (
+            {filteredData.map((item: Qna) => (
               <tr key={item.id} className="border-b border-gray-700">
                 <td className="p-2">
                   <Link href={`/review/${item.id}`}>
@@ -128,6 +144,8 @@ export default function ReviewPage() {
                 <td className="p-2">
                   {item.scheduleDate ? item.scheduleDate.split("T")[0] : "없음"}
                 </td>
+                <td className="p-2 text-center">{item.reviewCount}</td>{" "}
+                {/* ✅ 복습 횟수 표시 */}
                 <td className="p-4">
                   <button onClick={() => openModal(item.id)}>
                     <FiTrash2
@@ -140,7 +158,7 @@ export default function ReviewPage() {
             ))}
             {filteredData.length === 0 && (
               <tr>
-                <td colSpan={3} className="p-4 text-center text-gray-400">
+                <td colSpan={4} className="p-4 text-center text-gray-400">
                   검색 결과가 없습니다.
                 </td>
               </tr>

@@ -5,6 +5,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,4 +28,9 @@ public interface QnaRepository extends JpaRepository<Qna,UUID> {
 
     // 사용자별 전체 질문 수 조회
     Long countByUserIdAndIsDeletedFalse(UUID userId);
+
+    // 복습 횟수 업데이트
+    @Modifying
+    @Query("UPDATE Qna q SET q.reviewCount = q.reviewCount + 1, q.lastReviewedAt = :lastReviewedAt WHERE q.id = :qnaId")
+    void incrementReviewCount(@Param("qnaId") UUID qnaId, @Param("lastReviewedAt") LocalDateTime lastReviewedAt);
 }
