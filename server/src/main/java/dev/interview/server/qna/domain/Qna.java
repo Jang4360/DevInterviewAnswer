@@ -43,9 +43,6 @@ public class Qna {
     @Column(nullable = false)
     private boolean reviewed = false;
 
-    @Column(name = "review_count", nullable = false)
-    private int reviewCount;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "writing_id")
     private Writing writing;
