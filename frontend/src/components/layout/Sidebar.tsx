@@ -30,21 +30,23 @@ export default function Sidebar({ isSidebarOpen }: SidebarProps) {
       <div className="flex-1 mt-2 overflow-y-auto">
         <ul className="space-y-3 px-2">
           {reviews.length > 0 ? (
-            reviews.map((review: any) => (
-              <li
-                key={review.id}
-                className="text-sm hover:underline cursor-pointer"
-              >
-                <Link
-                  href={{
-                    pathname: `/review/${review.id}`,
-                    query: { fromSidebar: true },
-                  }}
+            reviews
+              .filter((review) => !review.isDeleted)
+              .map((review) => (
+                <li
+                  key={review.id}
+                  className="text-sm hover:underline cursor-pointer"
                 >
-                  {review.question}
-                </Link>
-              </li>
-            ))
+                  <Link
+                    href={{
+                      pathname: `/review/${review.id}`,
+                      query: { fromSidebar: true },
+                    }}
+                  >
+                    {review.question}
+                  </Link>
+                </li>
+              ))
           ) : (
             <li className="text-sm text-gray-400">
               오늘 복습할 질문이 없습니다.

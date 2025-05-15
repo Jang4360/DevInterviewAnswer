@@ -14,6 +14,7 @@ interface Qna {
   question: string;
   scheduleDate: string;
   reviewCount: number; // ✅ 복습 횟수 필드 추가
+  isDeleted?: boolean;
 }
 
 export default function ReviewPage() {
@@ -83,9 +84,11 @@ export default function ReviewPage() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const filteredData = data.filter((item: Qna) =>
-    item.question.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredData = data
+    .filter((item) => !item.isDeleted) // ✅ 삭제되지 않은 질문만 필터링
+    .filter((item) =>
+      item.question.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
   const openModal = (id: string) => {
     setSelectedId(id);

@@ -5,6 +5,7 @@ import api from "@/utils/api";
 interface Qna {
   id: string;
   question: string;
+  isDeleted?: boolean;
   // 필요하면 scheduleDate 등 추가
 }
 
@@ -19,7 +20,8 @@ const useTodayReviews = create<TodayReviewStore>((set) => ({
   fetchReviews: async (userId: string) => {
     try {
       const res = await api.get(`/qna/today?userId=${userId}`);
-      set({ reviews: res.data });
+      const filteredReviews = res.data.filter((qna: Qna) => !qna.isDeleted);
+      set({ reviews: filteredReviews });
     } catch (error) {
       console.error("오늘 복습 목록 로딩 실패", error);
     }

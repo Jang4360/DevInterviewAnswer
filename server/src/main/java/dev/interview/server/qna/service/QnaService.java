@@ -77,7 +77,10 @@ public class QnaService {
         LocalDateTime now = LocalDateTime.now();
         List<Qna> qnaList = qnaRepository
                 .findByUserIdAndScheduledDateLessThanEqualAndReviewedFalseAndIsDeletedFalse(userId, now);
-        return qnaList.stream().map(QnaTodayResponse::from).toList();
+        return qnaList.stream()
+                .filter(qna -> !qna.isDeleted())
+                .map(QnaTodayResponse::from)
+                .toList();
     }
 
 

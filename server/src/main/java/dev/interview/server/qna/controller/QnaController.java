@@ -22,7 +22,7 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/qna")
-@Tag(name = "QnQ", description = "GPT 질문 생성/복습 관련 API")
+@Tag(name = "QnA", description = "GPT 질문 생성/복습 관련 API")
 public class QnaController {
     private final QnaService qnaService;
 
