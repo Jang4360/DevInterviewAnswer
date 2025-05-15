@@ -131,7 +131,7 @@ export default function ReviewPage() {
               <th className="p-2">면접 질문</th>
               <th className="p-2">다음 리뷰일</th>
               <th className="p-2">복습 횟수</th> {/* ✅ 복습 횟수 헤더 추가 */}
-              <th className="p-0">삭제</th>
+              <th className="p-2">삭제</th>
             </tr>
           </thead>
           <tbody>
