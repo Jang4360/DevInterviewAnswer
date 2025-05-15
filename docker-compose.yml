@@ -28,7 +28,7 @@ services:
       - backend
 
   db:
-    image: postgres:15 # 최신 PostgreSQL 이미지 사용
+    image: postgres:15
     container_name: postgres
     ports:
       - "5432:5432"
