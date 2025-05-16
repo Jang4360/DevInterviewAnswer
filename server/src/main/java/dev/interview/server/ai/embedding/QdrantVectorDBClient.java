@@ -23,15 +23,7 @@ public class QdrantVectorDBClient implements VectorDBClient {
     @Value("${qdrant.api.url}")
     private String qdrantApiUrl;
 
-
     private static final String COLLECTION_NAME = "user_vectors";
-
-
-    // Qdrant 컬렉션 초기화 (없으면 생성)
-    @Override
-    public void saveEmbedding(UUID userId, String summary, List<Float> embedding) {
-        saveEmbeddingAsync(userId, summary, embedding).block(); // 비동기 호출을 동기로 래핑
-    }
 
     @Override
     public Mono<Void> saveEmbeddingAsync(UUID userId, String summary, List<Float> embedding) {

@@ -2,6 +2,7 @@ package dev.interview.server.ai.gpt;
 
 import dev.interview.server.ai.dto.GeneratedQnaResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
+@Slf4j
 @RequiredArgsConstructor
 public class OpenAiGptClient implements GptClient{
 
@@ -27,10 +29,6 @@ public class OpenAiGptClient implements GptClient{
     private String openAiApiKey;
 
     // 요약 및 유사글을 기반으로 GPT 에게 질문 / 답변 요청
-    @Override
-    public GeneratedQnaResponse generateQuestions(String summary, List<String> similarSummaries) {
-        return generateQuestionsAsync(summary, similarSummaries).block(); // 비동기 호출을 동기로 래핑
-    }
 
     // ✅ 비동기 메서드 추가
     @Override
@@ -62,7 +60,9 @@ public class OpenAiGptClient implements GptClient{
                     String content = (String) message.get("content");
                     return Mono.fromCallable(() -> parseQnaItems(content))
                             .map(qnaItems -> new GeneratedQnaResponse(qnaItems));
-                });
+                })
+                .doOnSuccess(resp -> log.info("✅ GPT 응답 처리 완료"))
+                .doOnError(e -> log.error("❌ GPT 응답 처리 오류: {}", e.getMessage()));
     }
     // QnA 아이템 파싱 메서드
     private List<GeneratedQnaResponse.QnaItem> parseQnaItems(String content) {

@@ -24,14 +24,17 @@ public class QuestionGenerationServiceImpl implements QuestionGenerationService 
 
     @Override
     public GeneratedQnaResponse generateQuestions(GenerateQuestionRequest request) {
-        return generateQuestionsAsync(request).block(); // 비동기 메서드 동기 호출로 래핑
+        return generateQuestionsAsync(request)
+                .doOnError(e -> log.error("질문 생성 실패: {}", e.getMessage()))
+                .blockOptional()
+                .orElseThrow(() -> new RuntimeException("질문 생성 실패"));
     }
 
     // 전체 질문 생성 프로세스
     @Override
     public Mono<GeneratedQnaResponse> generateQuestionsAsync(GenerateQuestionRequest request) {
         String lockKey = "lock:generate:" + request.userId();
-        boolean locked = redisLockService.tryLock(lockKey, Duration.ofSeconds(1));
+        boolean locked = redisLockService.tryLock(lockKey, Duration.ofMillis(500));
         if (!locked) {
             return Mono.error(new IllegalStateException("질문 생성 요청이 중복되었습니다."));
         }

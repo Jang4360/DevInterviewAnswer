@@ -34,7 +34,7 @@ jobs:
                 git pull origin main
             fi
 
-            # 3. .env 파일 반영.
+            # 3. .env 파일 반영
             echo "${{ secrets.ENV_FILE_ROOT }}" > /home/ubuntu/interview-platform/.env
             echo "${{ secrets.ENV_FILE_FRONT }}" > /home/ubuntu/interview-platform/frontend/.env
 

@@ -1,21 +1,20 @@
 package dev.interview.server.ai.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-import reactor.util.retry.Retry;
 
-import java.time.Duration;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class EmbeddingServiceImpl implements EmbeddingService{
 
@@ -23,10 +22,15 @@ public class EmbeddingServiceImpl implements EmbeddingService{
 
     @Value("${openai.api.key}")
     private String openAiApiKey;
+
     @Override
     public List<Float> createEmbedding(String text) {
-        return createEmbeddingAsync(text).block(); // 비동기 메서드 동기 호출로 래핑
+        return createEmbeddingAsync(text)
+                .doOnError(e -> log.error("Embedding 처리 오류: {}", e.getMessage()))
+                .blockOptional()
+                .orElse(Collections.emptyList());
     }
+
     // 글 요약 -> 임베딩 벡터 생성 (OpenAI API 사용)
     @Override
     public Mono<List<Float>> createEmbeddingAsync(String text) {
@@ -45,6 +49,7 @@ public class EmbeddingServiceImpl implements EmbeddingService{
                 .map(response -> {
                     Map embeddingData = (Map) ((List) response.get("data")).get(0);
                     return (List<Float>) embeddingData.get("embedding");
-                });
+                })
+                .doOnError(e -> log.error("Embedding API 호출 실패: {}",e.getMessage()));
     }
 }
