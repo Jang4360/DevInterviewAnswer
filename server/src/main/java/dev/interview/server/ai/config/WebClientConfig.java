@@ -18,15 +18,18 @@ import java.time.Duration;
 public class WebClientConfig {
     @Bean
     public WebClient webClient(WebClient.Builder builder) {
-        int maxConnections = 50;
-        int maxIdleTime = 30;  // 초
+        int maxConnections = 200; // 동시 접속자 증가에 대비 (200명까지)
+        int maxIdleTime = 10;  // 유휴 커넥션 시간
 
-        ConnectionProvider provider = ConnectionProvider.builder("fixed")
+        ConnectionProvider provider = ConnectionProvider.builder("custom")
                 .maxConnections(maxConnections)
-                .maxIdleTime(Duration.ofSeconds(maxIdleTime))  // 유휴 커넥션 시간
+                .maxIdleTime(Duration.ofSeconds(maxIdleTime))
+                .pendingAcquireTimeout(Duration.ofSeconds(5))  // 커넥션 대기 시간
+                .maxLifeTime(Duration.ofMinutes(2))            // 커넥션 최대 생명 주기
+                .evictInBackground(Duration.ofSeconds(60))     // 유휴 커넥션 정리 주기
                 .build();
 
-        HttpClient httpClient = HttpClient.create()
+        HttpClient httpClient = HttpClient.create(provider)
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 3000)
                 .responseTimeout(Duration.ofSeconds(5))
                 .doOnConnected(conn ->
