@@ -42,7 +42,12 @@ public class QuestionGenerationServiceImpl implements QuestionGenerationService 
         return summarizationService.summarizeAsync(request.content())
                 .flatMap(summary -> embeddingService.createEmbeddingAsync(summary)
                         .flatMap(embedding -> vectorDBClient.saveEmbeddingAsync(request.userId(), summary, embedding)
-                                .then(gptClient.generateQuestionsAsync(summary, List.of()))))
+                                .then(vectorDBClient.searchSimilarSummariesAsync(request.userId(),embedding))
+                                .flatMap(similarSummaries ->
+                                        gptClient.generateQuestionsAsync(summary, List.of())
+                                )
+                        )
+                )
                 .doFinally(signalType -> redisLockService.unlock(lockKey));
     }
 }
