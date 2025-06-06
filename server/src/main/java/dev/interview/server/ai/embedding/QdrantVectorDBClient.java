@@ -67,6 +67,11 @@ public class QdrantVectorDBClient implements VectorDBClient {
                         "must", List.of(
                                 Map.of("key", "userId", "match", Map.of("value", userId.toString()))
                         )
+                ),
+                "params", Map.of(
+                        "with_payload", true // 검색 결과에 payload(summary, userId 등)를 포함
+                        // "hnsw_ef": 128 // HNSW 인덱스 검색 효율성 조절 (선택 사항, 필요시 추가)
+                        // "exact": false // 정확한 최근접 이웃 검색 여부 (true 시 성능 저하, 보통 false)
                 )
         );
 
