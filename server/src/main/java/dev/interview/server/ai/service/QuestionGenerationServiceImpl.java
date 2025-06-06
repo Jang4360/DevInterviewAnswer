@@ -39,14 +39,23 @@ public class QuestionGenerationServiceImpl implements QuestionGenerationService 
             return Mono.error(new IllegalStateException("질문 생성 요청이 중복되었습니다."));
         }
 
+        // Option 1: 저장을 백그라운드에서 비동기 처리하고 검색은 즉시 수행 (결과에는 방금 저장한 임베딩 미포함)
         return summarizationService.summarizeAsync(request.content())
                 .flatMap(summary -> embeddingService.createEmbeddingAsync(summary)
-                        .flatMap(embedding -> vectorDBClient.saveEmbeddingAsync(request.userId(), summary, embedding)
-                                .then(vectorDBClient.searchSimilarSummariesAsync(request.userId(),embedding))
-                                .flatMap(similarSummaries ->
-                                        gptClient.generateQuestionsAsync(summary, List.of())
-                                )
-                        )
+                        .flatMap(embedding -> {
+                            // 저장은 별도의 Mono로 백그라운드에서 처리 (fire-and-forget 방식)
+                            vectorDBClient.saveEmbeddingAsync(request.userId(), summary, embedding)
+                                    .subscribe(
+                                            v -> log.info("백그라운드 Qdrant 저장 완료"),
+                                            e -> log.error("백그라운드 Qdrant 저장 실패: {}", e.getMessage())
+                                    );
+
+                            // 검색은 즉시 진행
+                            return vectorDBClient.searchSimilarSummariesAsync(request.userId(), embedding)
+                                    .flatMap(similarSummaries ->
+                                            gptClient.generateQuestionsAsync(summary, similarSummaries)
+                                    );
+                        })
                 )
                 .doFinally(signalType -> redisLockService.unlock(lockKey));
     }
