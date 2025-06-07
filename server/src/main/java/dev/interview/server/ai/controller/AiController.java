@@ -18,13 +18,21 @@ import org.springframework.web.bind.annotation.RestController;
 public class AiController {
     private final QuestionGenerationServiceImpl questionGenerationService;
 
-    // 질문 생성 API
+// 질문 생성 API
     @PostMapping("/generate-questions")
-    public Mono<ResponseEntity<?>> generateQuestions(@RequestBody GenerateQuestionRequest request) {
-        return questionGenerationService.generateQuestionsAsync(request) // 비동기 메서드 직접 반환
-                .map(ResponseEntity::ok)
-                .onErrorResume(IllegalStateException.class, e ->
-                        Mono.just(ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
-                                .body(new ErrorResponse("중복 요청입니다. 잠시 후 다시 시도해 주세요"))));
+    public ResponseEntity<?> generateQuestions(@RequestBody GenerateQuestionRequest request) {
+        try {
+
+            GeneratedQnaResponse response = questionGenerationService.generateQuestions(request);
+
+            return ResponseEntity.ok(response);
+
+        } catch (IllegalStateException e) {
+
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+
+                    .body(new ErrorResponse("중복 요청입니다. 잠시 후 다시 시도해 주세요"));
+
+        }
     }
 }

@@ -50,7 +50,7 @@ public class AiControllerTest extends RestDocsSupport {
         ));
 
         // test용 config에 등록된 gptClient mock이 사용됨
-        when(gptClient.generateQuestions(any(), any())).thenReturn(response);
+//        when(gptClient.generateQuestions(any(), any())).thenReturn(response);
 
         // when & then
         mockMvc.perform(post("/api/ai/generate-questions")

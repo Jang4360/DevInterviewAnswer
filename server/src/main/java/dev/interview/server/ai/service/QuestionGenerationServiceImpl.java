@@ -22,6 +22,14 @@ public class QuestionGenerationServiceImpl implements QuestionGenerationService 
     private final EmbeddingService embeddingService; // 임베딩 생성
     private final RedisLockService redisLockService;
 
+    @Override
+    public GeneratedQnaResponse generateQuestions(GenerateQuestionRequest request) {
+        return generateQuestionsAsync(request)
+                .doOnError(e -> log.error("질문 생성 실패: {}", e.getMessage()))
+                .blockOptional()
+                .orElseThrow(() -> new RuntimeException("질문 생성 실패"));
+    }
+
     // 전체 질문 생성 프로세스
     @Override
     public Mono<GeneratedQnaResponse> generateQuestionsAsync(GenerateQuestionRequest request) {
