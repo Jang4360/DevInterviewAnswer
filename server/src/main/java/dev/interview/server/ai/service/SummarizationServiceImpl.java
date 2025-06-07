@@ -19,11 +19,6 @@ public class SummarizationServiceImpl implements SummarizationService{
     @Value("${openai.api.key}")
     private String openAiApiKey;
 
-    @Override
-    public String summarize(String content) {
-        return summarizeAsync(content).block(); // 비동기 메서드 동기 호출로 래핑
-    }
-
     // 글 내용을 3문장으로 요약
     @Override
     public Mono<String> summarizeAsync(String content) {

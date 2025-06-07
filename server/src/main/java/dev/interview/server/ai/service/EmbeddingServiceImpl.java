@@ -23,14 +23,6 @@ public class EmbeddingServiceImpl implements EmbeddingService{
     @Value("${openai.api.key}")
     private String openAiApiKey;
 
-    @Override
-    public List<Float> createEmbedding(String text) {
-        return createEmbeddingAsync(text)
-                .doOnError(e -> log.error("Embedding 처리 오류: {}", e.getMessage()))
-                .blockOptional()
-                .orElse(Collections.emptyList());
-    }
-
     // 글 요약 -> 임베딩 벡터 생성 (OpenAI API 사용)
     @Override
     public Mono<List<Float>> createEmbeddingAsync(String text) {
