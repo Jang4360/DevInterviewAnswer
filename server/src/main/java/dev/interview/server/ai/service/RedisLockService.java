@@ -32,3 +32,16 @@ public class RedisLockService {
         redisTemplate.delete(key);
     }
 }
+
+Boolean locked = redisTemplate.opsForValue()
+        .setIfAbsent("generate:" + userId + ":" + writingId, "lock", Duration.ofSeconds(10));
+if (!Boolean.TRUE.equals(locked)) {
+        throw new DuplicateRequestException("이미 처리 중인 요청입니다.");
+}
+
+SET profiling = 1;
+
+-- 파티셔닝 적용 전 조회 성능 측정
+SELECT * FROM alarm_data WHERE di_idx = 5 AND ac_idx = 2 ORDER BY reg_date DESC;
+
+SHOW PROFILES;
